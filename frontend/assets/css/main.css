@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+
+.inactive___button{
+    @apply text-gray-400;
+}
+.active___button{
+    @apply bg-red-50 text-red-400 font-medium;
+}
+
