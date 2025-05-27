@@ -8,15 +8,16 @@
 
       <main class="space-y-2 mt-4">
         <div>
-          <UFormField label="Email" name="email" :error="error?.email && error?.email">
-            <UInput  v-model="credentials.email" size="lg" class="w-full" variant="outline" placeholder="Email Address..."
+          <UFormField label="Email" name="email" :error="error?.email && error?.email[0]" >
+            <UInput  v-model="credentials.email" size="lg" class="w-full m-0" variant="outline" placeholder="Email Address..."
             />
-            <!-- <small v-if="error?.email" class="text-red-500">{{ error?.email[0]}}</small> -->
+
           </UFormField>
+<!--          <small v-if="error?.email" class="text-red-500">{{ error?.email[0]}}</small>small-->
         </div>
         <div>
 
-          <UFormField label="Password"  name="password" :error="error?.password && error?.password">
+          <UFormField label="Password"  name="password" :error="error?.password && error?.password[0]">
             <UInput
                 v-model="credentials.password" size="lg" class="w-full" variant="outline"
                 placeholder="Password" :type="show ? 'text' : 'password'">
@@ -28,7 +29,7 @@
                     @click="show = !show"/>
               </template>
             </UInput>
-            <small v-if="error?.password" class="text-red-500">{{ error?.password[0]}}</small>
+
           </UFormField>
         </div>
 

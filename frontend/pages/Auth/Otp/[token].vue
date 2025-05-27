@@ -21,9 +21,9 @@
             {{ remainingTime.minutes }}:{{ remainingTime.seconds }}
           </p>
           <button
-                  v-show="!isLoading"
+                  v-show="!isPending"
                   class="mt-5 text-blue-700 hover:underline disabled:hover:no-underline disabled:opacity-45 disabled:cursor-not-allowed"
-                  :disabled="remainingTime.minutes != 0 && remainingTime.seconds != 0" type="button"
+                  :disabled="!isExpired" type="button"
                   @click="resendOtpFunc()">resend</button>
         </main>
         <UButton
@@ -49,44 +49,32 @@ import moment from 'moment'
 import {useAuthStore} from "~/stores/AuthStore";
 import {useMutation, useQueryClient} from "@tanstack/vue-query";
 import type {RemainingTime} from "~/shared/types/LoginType";
+
 const authStore = useAuthStore();
 const route = useRoute();
 const queryClient = useQueryClient();
 const toast = useToast()
-const {data: otpData, isLoading} = useQuery({
-  queryKey: ['otpInfo'],
-  queryFn: () => authStore.getOtpInfo(route?.params?.token ?? '')
+const {mutate:fetcOtp,isPending} = useMutation({
+  mutationFn: async () =>await authStore.getOtpInfo(route?.params?.token ?? ''),
+  onSuccess:(data) =>{
+    startTimer(data)
+  }
 })
+
+
 const otp = ref<string[]>([]);
 const { mutate: submitOtp, error, isPending: isPendingSubmit} = useMutation({
   mutationFn: () => authStore.otpVerification(otp, route.params.token || ''),
   onSuccess: async (data) => {
 
     await localStorage.setItem("token", data.token);
-    await localStorage.setItem("role", data.user?.role.role_name);
-    if (data.user.role.role_name === 'qad') return navigateTo({name: 'Qad-Dashboard'})
-    //
-    // {
-    //
-    //
-    // } else if (data.user.role.role_name == 'sdo') {
-    //
-    //
-    //   authStore.code = RoleEnum.SDO
-    //   await router.push({ name: 'SDO Dashboard' })
-    // } else {
-    //
-    //
-    //   authStore.code = RoleEnum.SCHOOL;
-    //   await router.push({ name: "Dashboard" });
-    // }
 
+   return  navigateTo({name:'Qad-Dashboard'});
   },
   onError: (err: any) => {
     console.log(err)
     toast.add({
       title:err.otp[0],
-
       color: 'error',
       icon:'material-symbols:error-outline'
     })
@@ -96,52 +84,54 @@ const { mutate: submitOtp, error, isPending: isPendingSubmit} = useMutation({
 const { mutate: resendOtpFunc } = useMutation({
   mutationFn: () =>authStore.resendOtp(route.params.token || ''),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['otpInfo'] })
-
+    isExpired.value = false;
+    fetcOtp()
     toast.add({
       title: 'OTP resent successfully',
       color: 'success',
     })
-  }
+  },
+
 })
-const timer = ref<number>(0);
+const timer = ref<any>(0);
 const remainingTime = ref<RemainingTime>({minutes: 0, seconds: 0});
+const isExpired = ref<boolean>(false);
 
-const isExpired = computed(() => {
-  return moment().isAfter(moment(otpData.value?.otp_expired_at));
-});
+const calculateRemainingTime = (date: string) => {
 
-const calculateRemainingTime = () => {
-  const expirationTime = moment(otpData.value?.otp_expired_at);
+  const expirationTime = moment(date);
   const currentTime = moment();
-  const duration = moment.duration(expirationTime.diff(currentTime));
+  const diffSec = currentTime.diff(expirationTime, 'seconds');
 
-  if (duration.asMilliseconds() > 0) {
+  const expirationTimeSec  = (10 * 60) - diffSec;
+
+  if (expirationTimeSec > 0) {
+
     remainingTime.value = {
-      minutes: Math.floor(duration.asMinutes()),
-      seconds: Math.floor(duration.asSeconds() % 60),
+      minutes: Math.floor(expirationTimeSec / 60),
+      seconds: Math.floor(expirationTimeSec % 60),
     };
   } else {
+    isExpired.value = true;
     remainingTime.value = {minutes: 0, seconds: 0};
   }
 };
 
-const startTimer = () => {
-  calculateRemainingTime();
+const startTimer =  (date:string) => {
+  calculateRemainingTime(date)
+
   timer.value = setInterval(() => {
-    calculateRemainingTime();
+    calculateRemainingTime(date)
     if (isExpired.value) {
       clearInterval(timer.value!);
+
     }
+
   }, 1000);
 };
-
-onMounted(() => {
-  startTimer();
-
-
-});
-
+onMounted( () =>{
+   fetcOtp()
+})
 onBeforeUnmount(() => {
   if (timer.value) {
     clearInterval(timer.value);

@@ -43,16 +43,16 @@ export const useAuthStore = defineStore('authStore', () => {
     };
     const getOtpInfo = async (token: string | string[]) => {
         try {
-            const response = await axiosDefault.guestAxiosInstance().get(`/api/otp-data/${token}`);
+            const response = await axiosDefault.guestAxiosInstance().get(`/api/auth/otp-data/${token}`);
             return response.data;
         } catch (error: any) {
             throw error.response;
         }
     }
-    const otpVerification = async (otp: Ref, token: string | RouteParamValue[]) => {
+    const otpVerification = async (otp: Ref, verification_id: string | RouteParamValue[]) => {
         try {
             const response = await axiosDefault.guestAxiosInstance().post(
-                    `/api/otp-verification`, {otp: otp.value.join(''), token: token});
+                    `/api/auth/otp-verification`, {otp: otp.value.join(''), verification_id: verification_id});
             return response.data;
         } catch (error: any) {
 
@@ -62,8 +62,8 @@ export const useAuthStore = defineStore('authStore', () => {
 
     const resendOtp = async (token: string | RouteParamValue[]) =>{
         try{
-            const response = await axiosDefault.guestAxiosInstance().post(
-                    `/api/otp-resend-verification`,{token: token});
+            const response = await axiosDefault.guestAxiosInstance().put(
+                    `/api/auth/otp-resend-verification`,{verification_id: token});
             return response.data;
         }catch(error: any)
         {
@@ -71,22 +71,18 @@ export const useAuthStore = defineStore('authStore', () => {
         }
     }
 
-    const userInfo = async (role: string) => {
+    const userInfo = async () => {
         try {
-            const response = await axiosDefault.authAxiosInstances().post(
-                    `/api/${role}/userInfo`
+            const response = await axiosDefault.authAxiosInstances().get(
+                    `/api/qad/userInfo`
                 );
             authUser.value = response.data;
 
         } catch (error: any) {
-            if (error.response.status) {
-                // AuthUser.value = false;
-                // localStorage.removeItem("__AuthUser");
-                // localStorage.removeItem("token");
-                // localStorage.removeItem("code");
-                // User.value = [];
-                // await router.push({ name: "login" });
-            }
+            authUser.value = {};
+            localStorage.removeItem("token");
+            throw error;
+
         }
     };
     return {authUser,logging_out,teahubLogin, getOtpInfo,otpVerification,resendOtp,userInfo,logout}
