@@ -18,7 +18,7 @@ class QadMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $tokenId = explode('|',$request->bearerToken())[0];
-        PersonalAccessToken::query()->where('id', $tokenId)->update(['expires_at' => Carbon::now()->addMinutes(1)]);
+        PersonalAccessToken::query()->where('id', $tokenId)->update(['expires_at' => Carbon::now()->addMinutes(30)]);
 
         return $next($request);
     }

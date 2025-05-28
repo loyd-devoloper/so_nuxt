@@ -61,7 +61,15 @@ const credentials = reactive<CredentialType>({
 const {error,mutate:loginFunc,isPending} = useMutation({
   mutationFn: () => authStore.teahubLogin(credentials),
   onSuccess: (data) => {
-     navigateTo({name: 'Auth-Otp-token', params: { 'token' : data}});
+
+    if(data.status === 201)
+    {
+      localStorage.setItem("token",  data.data.token);
+      navigateTo({name:'Qad-Dashboard'})
+    }else{
+      navigateTo({name: 'Auth-Otp-token', params: { 'token' : data.data.token}});
+    }
+
   },
   onError: (error : any) => {
 

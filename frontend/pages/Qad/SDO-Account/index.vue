@@ -8,7 +8,7 @@
       <UCard>
         <template #header>
           <Placeholder class="h-8" />
-          <QadNewStudent/>
+          <QadNewSdo/>
         </template>
 
         <table class="w-full text-sm text-left rtl:text-right text-gray-500">
@@ -76,7 +76,8 @@
 
 </template>
 <script setup lang="ts">
-import QadNewStudent from "~/components/Qad/SchoolAccount/QadNewStudent.vue";
+
+import QadNewSdo from "~/components/Qad/SdoAccount/QadNewSdo.vue";
 
 definePageMeta({
   middleware: ['qad-middleware'],

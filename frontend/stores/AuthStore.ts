@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('authStore', () => {
         try {
             await axiosDefault.guestAxiosInstance().get(`/sanctum/csrf-cookie`);
             const response = await axiosDefault.guestAxiosInstance().post(`/api/auth/qad/login`, credential)
-            return response.data?.token;
+            return response;
         } catch (error: any) {
             if (error.response.status === 422) {
                 console.log(error.response.data)
@@ -27,15 +27,15 @@ export const useAuthStore = defineStore('authStore', () => {
     const logout = async (role:string) => {
         logging_out.value = true;
         try {
-            await axiosDefault.authAxiosInstances().post(`/api/logout`);
+            await axiosDefault.authAxiosInstances().post(`/api/auth/logout`);
             setTimeout(() => {
                 logging_out.value = false;
                 authUser.value = {};
                 localStorage.removeItem("token");
                 localStorage.removeItem("role");
-                if(role === AccountRoleEnum.QAD || role === AccountRoleEnum.ADMIN){
+
                    return  navigateTo({name: 'Qad'})
-                }
+
             }, 1000);
         } catch (error:any) {
             logging_out.value = false;

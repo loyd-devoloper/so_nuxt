@@ -9,10 +9,8 @@
 
 
         <main class="space-y-2 mt-8">
-          <UFormField name="email" required>
-            <UPinInput v-model="otp" placeholder="○" length="6" :required="false" size="lg" class="w-full flex justify-evenly" type="number"/>
-
-
+          <UFormField name="otp" >
+            <UPinInput v-model="otp" required  placeholder="○" length="6" :required="false" size="lg" class="w-full flex justify-evenly" type="number"/>
           </UFormField>
 
           <p v-if="error?.status == 401" class="text-red-500 text-center">{{ error.data.errors?.otp[0] }}</p>
@@ -65,14 +63,12 @@ const {mutate:fetcOtp,isPending} = useMutation({
 const otp = ref<string[]>([]);
 const { mutate: submitOtp, error, isPending: isPendingSubmit} = useMutation({
   mutationFn: () => authStore.otpVerification(otp, route.params.token || ''),
-  onSuccess: async (data) => {
-
-    await localStorage.setItem("token", data.token);
-
+  onSuccess:  (data) => {
+     localStorage.setItem("token", data.token);
    return  navigateTo({name:'Qad-Dashboard'});
   },
   onError: (err: any) => {
-    console.log(err)
+
     toast.add({
       title:err.otp[0],
       color: 'error',

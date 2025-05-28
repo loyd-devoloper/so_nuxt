@@ -43,28 +43,33 @@ class AuthController extends Controller
                     "account_status" => $result->data->account_status,
                     "username" => $result->data->username,
                 ]);
-            $token = $user->createToken($request->email)->plainTextToken;
 
             $check = VerificationCode::query()->where('email', $result->data->email)->where('user_id', $user->id)->orderBy('id', 'desc')->first();
             $code = rand(100000, 999999);
             if ($check) {
+
                 if (!!$check->verified_at && $check->status == 1) {
-                    $checkTime = Carbon::now()->diffInMinutes(Carbon::parse($check->verified_at));
+                    $checkTime =Carbon::parse($check->verified_at)->diffInMinutes( Carbon::now());
 
                     if ($checkTime > 30) {
-                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code,]);
+
+                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
                         return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
                     } else {
-                        Auth::login($user);
+
+                        $token = $user->createToken($user->username)->plainTextToken;
+
+                        return response()->json(["token" => $token],201);
+
                     }
-                } else {
-                    $diff =  Carbon::parse($check->updated_at)->diffInMinutes(Carbon::now()) * 60;
+                }
+                else {
+
                     $diffSeconds =  Carbon::parse($check->updated_at)->diffInSeconds(Carbon::now());
 
 
-                    $total = $diff - $diffSeconds;
-
                     $fixMinus = (10 * 60) - $diffSeconds;
+
                     if ($fixMinus < 0) {
 
                         $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
@@ -85,10 +90,12 @@ class AuthController extends Controller
                 return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
 
             }
-            return response()->json(["message" => "Login Successful","token" => $token],200);
+
         } else {
             return response()->json(["errors" => ['email' => [$result->remarks]]], 422);
         }
+
+
     }
 
 
@@ -112,6 +119,7 @@ class AuthController extends Controller
             $otp->update([
                 'code' => null,
                 'verified_at'=>Carbon::now(),
+                'status'=>1
             ]);
             return response()->json(["token" => $token],200);
         }
@@ -142,5 +150,11 @@ class AuthController extends Controller
     {
 
             return response()->json($request->user());
+    }
+
+    public function logout(Request $request): void
+    {
+        $request->user()->currentAccessToken()->delete();
+
     }
 }
