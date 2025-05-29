@@ -22,5 +22,5 @@ Route::middleware(['auth:sanctum','qad'])->prefix('qad')->group(function () {
     Route::get('/sdo-accounts', [\App\Http\Controllers\API\QadSdoAccountController::class, 'index']);
     Route::post('/store/sdo-account', [\App\Http\Controllers\API\QadSdoAccountController::class, 'store']);
     Route::get('/edit/sdo-account/{sdo_account_id}', [\App\Http\Controllers\API\QadSdoAccountController::class, 'edit']);
-    Route::put('/update/sdo-account/{sdo_account_id}', [\App\Http\Controllers\API\QadSdoAccountController::class, 'update']);
+    Route::post('/update/sdo-account/{sdo_account_id}', [\App\Http\Controllers\API\QadSdoAccountController::class, 'update']);
 });

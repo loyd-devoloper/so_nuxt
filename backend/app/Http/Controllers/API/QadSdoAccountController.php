@@ -15,13 +15,22 @@ class QadSdoAccountController extends Controller
     public function index(request $request)
     {
         $limit = $request->limit ?? 10;
-        $sdoAccounts = SdoAccount::query()->paginate($limit);
+        $search = $request->q ?? '';
+        $sdoAccounts = SdoAccount::query()->where(function ($query) use ($search) {
+            $query->where('sdo_name', 'like', '%' . $search . '%')
+                   ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('type', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhere('sds_name', 'like', '%' . $search . '%')
+                    ->orWhere('asds_name', 'like', '%' . $search . '%')
+                    ->orWhere('sdo_code', 'like', '%' . $search . '%');
+        })->paginate($limit);
         return response()->json($sdoAccounts,200);
     }
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'sdo_code'=>'required',
+            'sdo_code'=>'required|unique:sdo_accounts,sdo_code',
             'sdo_name'=>'required',
             'sds_name'=>'required',
             'asds_name'=>'required',
@@ -58,8 +67,7 @@ class QadSdoAccountController extends Controller
             'sdo_name'=>'required',
             'sds_name'=>'required',
             'asds_name'=>'required',
-            'email'=>'required|email|unique:sdo_accounts,email',
-            'password'=>['required',Password::min(8)->mixedCase()->numbers()->symbols()],
+
             'type'=>'required',
             'status'=>'required',
         ]);

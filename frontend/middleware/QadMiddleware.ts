@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware(async () => {
             await authStore.userInfo()
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
          }catch(error : unknown){
-            // return navigateTo('/qad');
+            return navigateTo('/qad');
          }
       }
 

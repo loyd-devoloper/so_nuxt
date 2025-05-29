@@ -20,7 +20,8 @@ return new class extends Migration
             $table->enum('type',["city", "province"]);
             $table->string('password');
             $table->string('email')->unique();
-            $table->boolean('status')->default(0);
+
+            $table->enum('status',["active", "inactive"]);
             $table->timestamps();
         });
     }

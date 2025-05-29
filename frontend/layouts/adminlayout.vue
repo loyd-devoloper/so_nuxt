@@ -21,7 +21,7 @@
       </div>
     </aside>
 
-    <main class="w-full ">
+    <main class="  w-full max-w-[calc(100svw-15rem)]">
       <nav class="bg-white h-[4rem] border-b border-black/10 flex justify-end items-center px-4  ">
         <UDropdownMenu
             :items="profile"
@@ -53,9 +53,7 @@ import {useAuthStore} from "~/stores/AuthStore";
 
 const route = useRoute();
 const authStore = useAuthStore();
-onMounted(() =>{
-  console.log(route.name)
-})
+
 const items: BreadcrumbItem[] = [
   {
     label: 'Home',
