@@ -5,7 +5,7 @@
       <template #header>
         <div class="flex justify-between items-center gap-2">
           <QadNewSdo/>
-          <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." size="md" variant="outline"/>
+          <UInput v-model="search" type="search" icon="i-lucide-search" placeholder="Search..." size="md" variant="outline"/>
 
         </div>
       </template>
@@ -14,11 +14,16 @@
        <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
          <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
          <tr>
-           <th class="px-6 py-3 flex items-center gap-2" scope="col">
-             SDO Name <UIcon name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black"/>
+           <th class="px-6 py-3 " scope="col">
+
+             <div class="flex items-center gap-2">
+               SDO Name <UIcon @click="sortColumn('sdo_name')" name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black"/>
+             </div>
            </th>
            <th class="px-6 py-3" scope="col">
-             SDO Code
+             <div class="flex items-center gap-2">
+               SDO Code  <UIcon @click="sortColumn('sdo_code')" name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black"/>
+             </div>
            </th>
            <th class="px-6 py-3" scope="col">
              SDS Name
@@ -40,8 +45,15 @@
          <tbody>
          <tr v-show="isLoading">
            <td colspan="7" class=" w-full">
-             <div class="flex justify-center">
-               <UIcon name="tdesign:loading"  class="animate-spin" size="3rem"/>
+             <div class="flex justify-center py-10">
+               <UIcon name="ant-design:loading-3-quarters-outlined"  class="animate-spin text-black/80" size="3rem"/>
+             </div>
+           </td>
+         </tr>
+         <tr v-show="!isLoading && data?.data.length === 0">
+           <td colspan="7" class=" w-full">
+             <div class="flex justify-center py-10">
+               <p class="text-red-500 font-bold">No Data Found</p>
              </div>
            </td>
          </tr>
@@ -99,10 +111,11 @@ const route = useRoute();
 const queryClient = useQueryClient();
 const page = ref<number>(parseInt(route?.query?.page as string) || 1);
 const search = ref<string>('');
-const sort = ref<string>('')
+const sort = ref<string>('sdo_name')
+const direction = ref<string>('asc')
 const {data,isLoading} = useQuery({
-  queryKey: ['QAD_SDO_ACCOUNT', page],
-  queryFn: () => fetchSdoAccount(page, search.value,sort),
+  queryKey: ['QAD_SDO_ACCOUNT', page,direction],
+  queryFn: () => fetchSdoAccount(page, search.value,sort,direction),
 
 })
 watch(() => search.value, debounce(() => {
@@ -111,8 +124,9 @@ watch(() => search.value, debounce(() => {
 watch(() => page.value, (page) => {
   navigateTo({name: 'Qad-SDO-Account', query: {page: page}})
 })
-const toggleSort = () =>{
-
+const sortColumn = (column:string) =>{
+  direction.value = direction.value === 'asc' ? 'desc' : 'asc';
+  sort.value = column
 }
 definePageMeta({
   middleware: ['qad-middleware'],

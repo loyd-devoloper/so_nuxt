@@ -4,10 +4,10 @@ import type {SdoCredentialsType} from "#shared/types/Qad/SdoAccountType";
 import {PaginateAttr} from "#shared/enums/PaginateAttr";
 import type {Ref} from "vue";
 
-export async function storeSdoAccount(schoolCredentials: SdoCredentialsType){
+export async function storeSdoAccount(sdoAccountCredential: SdoCredentialsType){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().post("/api/qad/store/sdo-account", schoolCredentials);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().post("/api/qad/sdo-account/store", sdoAccountCredential);
         return response.data.success;
     }catch(error:any)
     {
@@ -15,10 +15,12 @@ export async function storeSdoAccount(schoolCredentials: SdoCredentialsType){
     }
 
 }
-export async function fetchSdoAccount(page: Ref,search: string,sortColumn: Ref){
+export async function fetchSdoAccount(page: Ref,search: string,sortColumn: Ref,direction: Ref){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/sdo-accounts?q=${search}&limit=${PaginateAttr.LIMIT}&page=${page.value}&${sortColumn.value}`);
+        const response =   await useAxiosDefaultStore()
+                                                        .authAxiosInstances()
+                                                        .get(`/api/qad/sdo-account?q=${search}&limit=${PaginateAttr.LIMIT}&page=${page.value}&sort=${sortColumn.value}&d=${direction.value}`);
         return response.data;
     }catch(error:any)
     {
@@ -30,7 +32,7 @@ export async function fetchSdoAccount(page: Ref,search: string,sortColumn: Ref){
 export async function editSdoAccount(sdo_account_id: string | number){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/edit/sdo-account/${sdo_account_id}`);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/sdo-account/edit/${sdo_account_id}`);
         return response.data;
     }catch(error:any)
     {
@@ -39,10 +41,10 @@ export async function editSdoAccount(sdo_account_id: string | number){
 
 }
 
-export async function updateSdoAccount(sdo_account_id: string | number,schoolCredentials: SdoCredentialsType){
+export async function updateSdoAccount(sdo_account_id: string | number,sdoAccountCredential: SdoCredentialsType){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/update/sdo-account/${sdo_account_id}`,schoolCredentials);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/sdo-account/update/${sdo_account_id}`,sdoAccountCredential);
         return response.data.success;
     }catch(error:any)
     {

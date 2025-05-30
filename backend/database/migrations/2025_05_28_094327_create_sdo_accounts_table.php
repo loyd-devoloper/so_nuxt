@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('sdo_code')->unique();
             $table->string('sdo_name');
-            $table->string('sds_name')->nullable();
-            $table->string('asds_name')->nullable();
+            $table->text('sds_name')->nullable();
+            $table->text('asds_name')->nullable();
             $table->enum('type',["city", "province"]);
             $table->string('password');
             $table->string('email')->unique();

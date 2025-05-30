@@ -11,7 +11,7 @@
             <h2 class="font-bold">SDO Details</h2>
             <div class="grid grid-cols-2 gap-5 ">
               <UFormField :error="error?.sdo_code && error?.sdo_code[0]" label="SDO Code" required>
-                <UInput v-model="sdoCredentials.sdo_code" class="w-full" size="lg" type="number" variant="outline"/>
+                <UInput v-model="sdoCredentials.sdo_code" class="w-full" size="lg" type="text" variant="outline"/>
                 <!--            <small v-if="error?.email" class="text-red-500">{{ error?.email[0]}}</small>-->
               </UFormField>
               <UFormField :error="error?.sdo_name && error?.sdo_name[0]" label="SDO Name" required>
@@ -21,11 +21,11 @@
 
             </div>
             <div  class="grid grid-cols-2 gap-5 ">
-              <UFormField :error="error?.sds_name && error?.sds_name[0]" label="SDS Name" required>
+              <UFormField :error="error?.sds_name && error?.sds_name[0]" label="SDS Name"  hint="Optional">
                 <UInput v-model="sdoCredentials.sds_name" class="w-full" size="lg" type="text" variant="outline"/>
                 <!--            <small v-if="error?.email" class="text-red-500">{{ error?.email[0]}}</small>-->
               </UFormField>
-              <UFormField :error="error?.asds_name && error?.asds_name[0]" label="ASDS Address" required>
+              <UFormField :error="error?.asds_name && error?.asds_name[0]" label="ASDS Name" hint="Optional">
                 <UInput v-model="sdoCredentials.asds_name" class="w-full" size="lg" type="text" variant="outline"/>
 
               </UFormField>
