@@ -57,9 +57,9 @@ class AuthController extends Controller
                         return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
                     } else {
 
-                        $token = $user->createToken($user->username)->plainTextToken;
+                        $token = $user->createToken('Qad')->plainTextToken;
 
-                        return response()->json(["token" => $token],201);
+                        return response()->json(["token" => $token,'role'=>'Qad'],201);
 
                     }
                 }
@@ -152,9 +152,12 @@ class AuthController extends Controller
             return response()->json($request->user());
     }
 
-    public function logout(Request $request): void
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
-
+        return response()->json([
+            'message',
+            'account logged out'
+        ], 200);
     }
 }

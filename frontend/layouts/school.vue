@@ -1,5 +1,6 @@
 <template>
   <div class="flex min-h-screen max-h-[100svh]">
+    <First_time_login/>
     <UModal :dismissible="false" :open="authStore.logging_out" class="w-fit">
 
       <template #content>
@@ -14,9 +15,10 @@
       <header class="py-5">
         <NuxtImg alt="logo" class=" mx-auto" height="250" loading="lazy" src="/logo.svg" width="250"/>
       </header>
-      <div class=" px-2">
+      <div class=" px-4">
 
-        <UNavigationMenu :items="sidebarItem" class="data-[orientation=vertical]" default-value="1"
+        <UNavigationMenu
+:items="sidebarItem" class="data-[orientation=vertical]" default-value="1"
                          orientation="vertical"/>
       </div>
     </aside>
@@ -48,8 +50,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import type {BreadcrumbItem, DropdownMenuItem,NavigationMenuItem} from '@nuxt/ui'
+import type {BreadcrumbItem, DropdownMenuItem} from '@nuxt/ui'
 import {useAuthStore} from "~/stores/AuthStore";
+import First_time_login from "~/components/School/first_time_login.vue";
 
 const route = useRoute();
 const authStore = useAuthStore();
@@ -83,7 +86,7 @@ const profile = ref<DropdownMenuItem[][]>([
       label: 'Logout',
       icon: 'material-symbols:logout-rounded',
       onSelect: () => {
-        authStore.logout(localStorage.getItem('role'))
+        authStore.logout('School')
       },
     }
   ],
@@ -93,43 +96,11 @@ const sidebarItem = computed(() => [
   {
     label: 'Dashboard',
     icon: 'material-symbols-light:dashboard-rounded',
-    active: route.name == 'Qad-Dashboard',
-    to:{name: 'Qad-Dashboard'}
+    active: route.name == 'School',
+    to:{name: 'School'}
 
   },
-  {
-    label:'Accounts',
-    icon: 'ic:twotone-manage-accounts',
-    active: route.name == 'Qad-School-Account' || route.name == 'Qad-SDO-Account',
-    defaultOpen: route.name == 'Qad-School-Account' || route.name == 'Qad-SDO-Account',
-    collapsible: true,
-    type:'trigger',
-    children:[
-      {
-        label: 'School Account',
-        icon: 'ph:dot-outline',
-        active: route.name == 'Qad-School-Account',
-        to: {name: 'Qad-School-Account'},
-        type:'link',
-      },
-      {
-        label: 'SDO Account',
-        icon: 'ph:dot-outline',
-        active: route.name == 'Qad-SDO-Account',
-        type:'link',
-        onSelect:() =>{
-          navigateTo({name: 'Qad-SDO-Account'})
-        }
-      }
-    ]
-  },
-  {
-    label: 'Curriculum Management',
-    icon: 'streamline:quality-education',
-    active: route.name == 'Qad-Curriculum-Management' || route.name == 'Qad-Curriculum-Management-Programs-curriculum_id',
-    to:{name: 'Qad-Curriculum-Management'}
 
-  },
 
 ])
 

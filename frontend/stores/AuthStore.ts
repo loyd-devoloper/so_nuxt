@@ -1,5 +1,5 @@
 import {useAxiosDefaultStore} from "~/stores/AxiosDefault";
-import type {CredentialType} from "~/shared/types/LoginType";
+import type {CredentialType, SchoolCredentialType} from "~/shared/types/LoginType";
 import type {RouteParamValue} from "#vue-router";
 import {AccountRoleEnum} from "#shared/enums/AccountRoleEnum";
 
@@ -9,7 +9,20 @@ export const useAuthStore = defineStore('authStore', () => {
     const logging_out = ref<boolean>(false)
     const axiosDefault = useAxiosDefaultStore();
 
-
+    const schoolLogin = async (credential: SchoolCredentialType) => {
+        try {
+            await axiosDefault.guestAxiosInstance().get(`/sanctum/csrf-cookie`);
+            const response = await axiosDefault.guestAxiosInstance().post(`/api/auth/school/login`, credential)
+            return response;
+        } catch (error: any) {
+            if (error.response.status === 422) {
+                console.log(error.response.data)
+                throw error?.response.data.errors;
+            } else {
+                throw error;
+            }
+        }
+    }
     const teahubLogin = async (credential: CredentialType) => {
         try {
             await axiosDefault.guestAxiosInstance().get(`/sanctum/csrf-cookie`);
@@ -33,8 +46,10 @@ export const useAuthStore = defineStore('authStore', () => {
                 authUser.value = {};
                 localStorage.removeItem("token");
                 localStorage.removeItem("role");
+                if(role === 'Qad') return  navigateTo({name: 'Qad'})
+                if(role === 'School') return  navigateTo('/')
 
-                   return  navigateTo({name: 'Qad'})
+
 
             }, 1000);
         } catch (error:any) {
@@ -81,9 +96,25 @@ export const useAuthStore = defineStore('authStore', () => {
         } catch (error: any) {
             authUser.value = {};
             localStorage.removeItem("token");
+            localStorage.removeItem('role');
             throw error;
 
         }
     };
-    return {authUser,logging_out,teahubLogin, getOtpInfo,otpVerification,resendOtp,userInfo,logout}
+    const schoolInfo = async () => {
+        try {
+            const response = await axiosDefault.authAxiosInstances().get(
+                `/api/school/schoolInfo`
+            );
+            authUser.value = response.data[0];
+            localStorage.setItem("role",response.data[1]);
+        } catch (error: any) {
+            authUser.value = {};
+            localStorage.removeItem("token");
+            localStorage.removeItem('role');
+            throw error;
+
+        }
+    };
+    return {authUser,logging_out,teahubLogin,schoolInfo,schoolLogin, getOtpInfo,otpVerification,resendOtp,userInfo,logout}
 })

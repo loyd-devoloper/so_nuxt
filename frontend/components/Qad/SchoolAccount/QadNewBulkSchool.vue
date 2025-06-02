@@ -44,6 +44,7 @@ const {mutate: storeSchoolBulkAccountFunc, error, isPending} = useMutation({
     toast.add({
       title: data,
       color: 'success',
+      icon:'ooui:success'
     })
   },
   onError: (err: any) => {

@@ -65,6 +65,7 @@ const {error,mutate:loginFunc,isPending} = useMutation({
     if(data.status === 201)
     {
       localStorage.setItem("token",  data.data.token);
+      localStorage.setItem("role",  data.data.role);
       navigateTo({name:'Qad-Dashboard'})
     }else{
       navigateTo({name: 'Auth-Otp-token', params: { 'token' : data.data.token}});
