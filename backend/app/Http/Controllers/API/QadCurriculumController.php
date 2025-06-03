@@ -88,24 +88,22 @@ class QadCurriculumController extends Controller
 
     }
 
-    public function storeProgram(Request $request): \Illuminate\Http\JsonResponse
+    public function storeProgram(Request $request,$curriculum_id): \Illuminate\Http\JsonResponse
     {
         $validator = Validator::make($request->all(), [
             "track"             => 'required',
             "track_key"               => 'required',
+            "strand"               => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        $data = [];
-        foreach ($request->strand as $key => $value) {
-            $data[$value['name']]=  $value['values'];
-        }
+
         ProgramList::query()->create([
-            'curriculum_id'=>1,
+            'curriculum_id'=>$curriculum_id,
             'track'=>$request->input('track'),
             'track_key'=>$request->input('track_key'),
-            'strand'=>$data,
+            'strand'=>$request->strand,
         ]);
         return response()->json(['success'=>'Created Successfully'], 201);
     }
@@ -118,5 +116,36 @@ class QadCurriculumController extends Controller
 
         $programs = ProgramList::query()->where('curriculum_id',$curriculum_id)->orderBy($sortColumn, $sortDirection)->paginate($limit);
         return response()->json($programs, 200);
+    }
+
+    public function showProgram($curriculum_id,$program_id): \Illuminate\Http\JsonResponse
+    {
+       return response()->json(ProgramList::query()->where('curriculum_id',$curriculum_id)->where('id',$program_id)->first(), 200);
+    }
+    public function destroyProgram($program_id): \Illuminate\Http\JsonResponse
+    {
+        ProgramList::query()->where('id',$program_id)->delete();
+       return response()->json(['success'=>'Program Deleted Successfully'], 200);
+    }
+    public function updateProgram(Request $request,$program_id): \Illuminate\Http\JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            "track"             => 'required',
+            "track_key"               => 'required',
+            "strand"               => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        ProgramList::query()
+            ->where('id',$program_id)
+            ->update([
+
+            'track'=>$request->input('track'),
+            'track_key'=>$request->input('track_key'),
+            'strand'=>$request->strand,
+        ]);
+        return response()->json(['success'=>'Program Updated Successfully'], 201);
     }
 }

@@ -15,4 +15,9 @@ class Curriculum extends Model
         'open_date',
         'closing_date',
     ];
+
+    public function programs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProgramList::class,'curriculum_id','id');
+    }
 }

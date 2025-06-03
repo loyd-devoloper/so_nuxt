@@ -46,10 +46,15 @@ Route::middleware(['auth:sanctum','qad'])->prefix('qad')->group(function () {
         Route::post('/store','store');
         Route::get('/edit/{school_account_id}', 'show');
         Route::post('/update/{school_account_id}','update');
-        Route::post('/store-program', 'storeProgram');
+        Route::post('/store-program/{curriculum_id}', 'storeProgram');
         Route::get('/programs/{curriculum_id}', 'indexProgram');
+        Route::get('/program/edit/{curriculum_id}/{program_id}', 'showProgram');
+        Route::post('/program/update/{program_id}', 'updateProgram');
+        Route::delete('/program/delete/{program_id}', 'destroyProgram');
     });
 });
 Route::middleware(['auth:sanctum','qad'])->prefix('school')->group(function () {
     Route::get('schoolInfo',[\App\Http\Controllers\API\School\AuthController::class,'schoolInfo']);
+    Route::get('latest/curriculum',[\App\Http\Controllers\API\School\AuthController::class,'latestCurriculum']);
+    Route::post('first-time-login',[\App\Http\Controllers\API\School\AuthController::class,'firstTimeLogin']);
 });
