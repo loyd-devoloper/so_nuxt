@@ -1,12 +1,13 @@
 import {useAxiosDefaultStore} from "~/stores/AxiosDefault";
 import type {FirstTimeLoginType} from "#shared/types/School/firstTimeLoginType";
+import type {NewApplicationType} from "#shared/types/School/SchoolApplicationType";
 
 
 
-export async function fetchLatestCurriculum(){
+export async function fetchActiveCurriculum(){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().get("/api/school/latest/curriculum");
+        const response =   await useAxiosDefaultStore().authAxiosInstances().get("/api/school/active-curricula");
         return response.data;
     }catch(error:any)
     {
@@ -20,22 +21,17 @@ export async function fetchLatestCurriculum(){
     }
 
 }
-
-export async function firstTimeLogin(credentails: FirstTimeLoginType){
+export async function storeApplication(applicationData: NewApplicationType){
     try
     {
-
         const formData = new FormData();
-        for (const item in credentails) {
+        for (const item in applicationData) {
 
-            if (item !== 'program_offered') {
+                formData.append(item, applicationData[item]);
 
-                formData.append(item, credentails[item]);
-            }
 
         }
-        formData.append('program_offered', JSON.stringify(credentails.program_offered));
-        const response =   await useAxiosDefaultStore().authAxiosInstances().post("/api/school/first-time-login",formData);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().post("/api/school/transaction/store",applicationData);
         return response.data;
     }catch(error:any)
     {

@@ -9,10 +9,9 @@
       <main class="space-y-2 mt-4">
 
         <div>
-          <UFormField label="Email" name="email" :error="error?.school_number && error?.school_number[0]" >
+          <UFormField label="School Number" name="email" :error="error?.school_number && error?.school_number[0]" >
             <UInput  v-model="credentials.school_number" size="lg" type="number" class="w-full m-0" variant="outline" placeholder="12312313"
             />
-
           </UFormField>
         </div>
         <div>

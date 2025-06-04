@@ -1,6 +1,6 @@
 export type CredentialType =  {
-    email: string,
-    password: string
+    email: string;
+    password: string;
 };
 
 export type RemainingTime = {
@@ -9,6 +9,6 @@ export type RemainingTime = {
 }
 
 export type SchoolCredentialType =  {
-    school_number?: string,
-    password?: string
+    school_number?: string;
+    password?: string;
 };

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
-
+@plugin "@tailwindcss/typography";
 
 .inactive___button{
     @apply text-gray-400;

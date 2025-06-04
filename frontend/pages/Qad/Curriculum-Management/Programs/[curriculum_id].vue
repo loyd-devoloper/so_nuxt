@@ -52,37 +52,24 @@
               {{ program?.track }}
             </th>
             <td class="px-6 py-4">
-              {{  }}
+
               <div v-for="(track,index) in program.strand" :key="track.id">
-                 <strong>{{index}}:</strong>
-               <div>
-                 <li v-for="spec in track" :key="spec">{{spec}}</li>
+               {{index+1}}. <strong> {{track.name}}:</strong>
+               <div class="pl-4">
+
+                 <li v-for="spec in track?.values" :key="spec">{{spec}}</li>
                </div>
               </div>
             </td>
 
-            <td class="px-6 py-4">
-              {{ program?.open_date }}
-            </td>
-            <td class="px-6 py-4">
-              {{ program?.closing_date }}
-            </td>
+        
 
-            <td class="px-6 py-4">
-              <div class="flex items-center">
-                <div
-                    :class="program?.is_open_for_so_application === 'Open' ? ' bg-green-500' : ' bg-red-500'"
-                    class="h-2.5 w-2.5 rounded-full me-2 "/>
-                <span class="capitalize">{{ program?.is_open_for_so_application }}</span>
-              </div>
-
-            </td>
             <td class="px-6 py-4 space-x-2">
-
+              <QadEditProgram :program_id="program.id" :curriculum_id="route.params.curriculum_id" />
+              <UButton  color="error" icon="ic:baseline-delete" label="EDIT" size="sm"  type="button" variant="outline" @click="deleteProgramFunc(program.id)">Delete</UButton>
 
             </td>
           </tr>
-
           </tbody>
         </table>
       </div>
@@ -99,9 +86,10 @@
 </template>
 <script lang="ts" setup>
 import debounce from 'lodash.debounce'
-import {fetchCurricula, fetchPrograms} from "#shared/API/Qad/CurriculumManagementApi";
-import QadEditCurriculum from "~/components/Qad/CurriculumManagement/QadEditCurriculum.vue";
+import {deleteProgram, fetchPrograms} from "#shared/API/Qad/CurriculumManagementApi";
+
 import QadNewProgram from "~/components/Qad/CurriculumManagement/QadNewProgram.vue";
+import QadEditProgram from "~/components/Qad/CurriculumManagement/QadEditProgram.vue";
 
 
 const route = useRoute();
@@ -110,15 +98,28 @@ const page = ref<number>(parseInt(route?.query?.page as string) || 1);
 const search = ref<string>('');
 const sort = ref<string>('')
 const direction = ref<string>('asc')
+const toast = useToast()
 const {data,isLoading} = useQuery({
-  queryKey: ['QAD_CURRICULUM_MANAGEMENT', page,direction],
+  queryKey: ['QAD_CURRICULUM_MANAGEMENT_PROGRAM_LIST', page,direction,route.params.curriculum_id || 0],
   queryFn: () => fetchPrograms(page, search.value,sort,direction,route.params.curriculum_id || 0),
 })
 watch(() => search.value, debounce(() => {
-  queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT"]});
+  queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT_PROGRAM_LIST"]});
 }, 300))
 watch(() => page.value, (page) => {
   navigateTo({name: 'Qad-Curriculum-Management', query: {page: page}})
+})
+
+const {mutate: deleteProgramFunc} = useMutation({
+  mutationFn:(id: string | number) =>deleteProgram(id),
+  onSuccess: (data) => {
+    queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT_PROGRAM_LIST"]});
+    toast.add({
+      title: data,
+      color: 'success',
+      icon: 'ooui:success'
+    })
+  }
 })
 const sortColumn = (column:string) =>{
   direction.value = direction.value === 'asc' ? 'desc' : 'asc';

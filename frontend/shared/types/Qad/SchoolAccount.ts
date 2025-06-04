@@ -7,6 +7,6 @@ export type SchoolCredentialsType = {
     school_name?:string
     school_address?:string
     sdo_id?:number | string
-    status?: string;
+    status?: string
 }
 

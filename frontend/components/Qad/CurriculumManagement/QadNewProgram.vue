@@ -1,20 +1,20 @@
 <template>
 
 
-  <UModal v-model:open="open" :close="true" title="New Curriculum" >
-    <UButton color="secondary" icon="basil:add-outline" label="Create Curriculum" type="button" variant="solid"/>
+  <UModal v-model:open="open" :close="true" title="New Program" >
+    <UButton color="secondary" icon="basil:add-outline" label="Create Program" type="button" variant="solid"/>
     <template #body>
       <form class=" space-y-3" @submit.prevent="storeProgramFunc()">
 
         <div class="grid grid-cols-2 gap-5 ">
           <UFormField :error="error?.track && error?.track[0]" label="Track" required>
             <UInput
-                v-model="programData.track" class="w-full" size="lg" type="text"
+                v-model="programData.track" class="w-full" required size="lg" type="text"
                 variant="outline"/>
           </UFormField>
           <UFormField :error="error?.track_key && error?.track_key[0]" label="Track key" required>
             <UInput
-                v-model="programData.track_key" class="w-full" size="lg" type="text"
+                v-model="programData.track_key" required class="w-full" size="lg" type="text"
                 variant="outline"/>
           </UFormField>
         </div>
@@ -23,9 +23,9 @@
         }">Strand</UButton>
 
         <div v-for="(strnd,index) in programData.strand" :key="strnd">
-          <UFormField :error="error?.track_key && error?.track_key[0]" label="Strand" required>
+          <UFormField :error="error?.strand && error?.strand[0]" label="Strand" required>
             <UInput
-                v-model="programData.strand[index].name"  class="w-full" size="lg" type="text"
+                v-model="programData.strand[index].name" required class="w-full" size="lg" type="text"
                 variant="outline"/>
           </UFormField>
           <div class="flex justify-end">
@@ -45,6 +45,7 @@
               <UInput
                   v-model="programData.strand[index].values[indexSpec]"
                   class="w-full" size="lg" type="text"
+                  required
                   variant="outline"/>
             </UFormField>
             <UIcon
@@ -70,9 +71,8 @@
 <script lang="ts" setup>
 import {useMutation} from '@tanstack/vue-query'
 import type {ProgramsType} from "#shared/types/Qad/CurriculumType";
-import {storeCurriculum, storeProgram} from "#shared/API/Qad/CurriculumManagementApi";
-
-
+import { storeProgram} from "#shared/API/Qad/CurriculumManagementApi";
+const route = useRoute();
 const toast = useToast()
 const open = ref<boolean>(false)
 const queryClient = useQueryClient();
@@ -84,9 +84,9 @@ const programData = reactive<ProgramsType>({
 })
 
 const {mutate: storeProgramFunc, error, isPending} = useMutation({
-  mutationFn: () => storeProgram(programData),
+  mutationFn: () => storeProgram(programData,route.params.curriculum_id || 0),
   onSuccess: (data) => {
-    queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT"]});
+    queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT_PROGRAM_LIST"]});
     open.value = false;
     toast.add({
       title: data,

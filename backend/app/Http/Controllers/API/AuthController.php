@@ -115,13 +115,13 @@ class AuthController extends Controller
         if($otp->code == $request->otp)
         {
             $user = User::query()->where('id', $otp->user_id)->first();
-            $token = $user->createToken($user->username)->plainTextToken;
+            $token = $user->createToken('Qad')->plainTextToken;
             $otp->update([
                 'code' => null,
                 'verified_at'=>Carbon::now(),
                 'status'=>1
             ]);
-            return response()->json(["token" => $token],200);
+            return response()->json(["token" => $token,"role"=>'Qad'],200);
         }
         return response()->json(['errors' => ['otp' => ['Invalid OTP']]], 401);
     }

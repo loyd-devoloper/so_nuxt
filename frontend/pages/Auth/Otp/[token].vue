@@ -65,6 +65,8 @@ const { mutate: submitOtp, error, isPending: isPendingSubmit} = useMutation({
   mutationFn: () => authStore.otpVerification(otp, route.params.token || ''),
   onSuccess:  (data) => {
      localStorage.setItem("token", data.token);
+     localStorage.setItem("role", data.role);
+
    return  navigateTo({name:'Qad-Dashboard'});
   },
   onError: (err: any) => {

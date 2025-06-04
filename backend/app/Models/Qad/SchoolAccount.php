@@ -2,6 +2,8 @@
 
 namespace App\Models\Qad;
 
+use App\Models\School\Documents;
+use App\Models\School\ProgramOffered;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,7 +41,7 @@ class SchoolAccount extends Authenticatable
         return Attribute::make(
             get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
             set: fn (?string $value) => $value ? Crypt::encryptString($value) : null,
-        );
+        )->shouldCache();
     }
     protected function schoolContactNumber(): Attribute
     {
@@ -56,7 +58,7 @@ class SchoolAccount extends Authenticatable
         );
     }
 
-    protected function schoolemailAddress(): Attribute
+    protected function schoolEmailAddress(): Attribute
     {
         return Attribute::make(
             get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
@@ -94,5 +96,14 @@ class SchoolAccount extends Authenticatable
     public function sdoInformation(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(SdoAccount::class, 'id', 'sdo_id');
+    }
+    public function programOffered(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProgramOffered::class, 'school_id', 'id');
+    }
+
+    public function accountAttachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Documents::class, 'school_id', 'id');
     }
 }

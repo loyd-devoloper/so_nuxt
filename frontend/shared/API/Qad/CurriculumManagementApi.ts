@@ -56,10 +56,10 @@ export async function updateCurriculum(curriculum_id: string | number,curriculum
 
 }
 
-export async function storeProgram(programData: ProgramsType){
+export async function storeProgram(programData: ProgramsType,curriculum_id: string | number){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/curriculum/store-program`,programData);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/curriculum/store-program/${curriculum_id}`,programData);
         return response.data.success;
     }catch(error:any)
     {
@@ -74,6 +74,39 @@ export async function fetchPrograms(page: Ref,search: string,sortColumn: Ref,dir
             .authAxiosInstances()
             .get(`/api/qad/curriculum/programs/${curriculum_id}?q=${search}&limit=${PaginateAttr.LIMIT}&page=${page.value}&sort=${sortColumn.value}&d=${direction.value}`);
         return response.data;
+    }catch(error:any)
+    {
+        throw error.response.data.errors;
+    }
+
+}
+export async function editProgram(curriculum_id?: string | number,program_id?: string | number){
+    try
+    {
+        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/curriculum/program/edit/${curriculum_id}/${program_id}`);
+        return response.data;
+    }catch(error:any)
+    {
+        throw error.response;
+    }
+
+}
+export async function updateProgram(programData: ProgramsType,program_id?: string | number){
+    try
+    {
+        const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/curriculum/program/update/${program_id}`,programData);
+        return response.data.success;
+    }catch(error:any)
+    {
+        throw error.response.data.errors;
+    }
+
+}
+export async function deleteProgram(program_id?: string | number){
+    try
+    {
+        const response =   await useAxiosDefaultStore().authAxiosInstances().delete(`/api/qad/curriculum/program/delete/${program_id}`);
+        return response.data.success;
     }catch(error:any)
     {
         throw error.response.data.errors;

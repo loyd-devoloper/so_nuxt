@@ -1,9 +1,9 @@
 <template>
 
   <div>
-    <UModal  v-model:open="open"  title="New SDO Account">
+    <UModal  v-model:open="open"  title="New SDO Account" :modal="true" >
 
-      <UButton color="secondary" size="md" icon="basil:add-outline" label="Create Sdo Account" type="button" variant="solid"/>
+
 
       <template #body>
         <form ref="newSdoAccount" @submit.prevent="storeSchoolAccountFunc()">
@@ -91,7 +91,7 @@
 
         </form>
       </template>
-
+      <UButton color="secondary" size="md" icon="basil:add-outline" label="Create Sdo Account" type="button" variant="solid"/>
     </UModal>
 
   </div>

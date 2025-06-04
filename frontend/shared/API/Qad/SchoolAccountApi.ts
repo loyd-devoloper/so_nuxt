@@ -1,9 +1,9 @@
-
 import {useAxiosDefaultStore} from "~/stores/AxiosDefault";
 
 import {PaginateAttr} from "#shared/enums/PaginateAttr";
 import type {Ref} from "vue";
 import type {SchoolCredentialsType} from "#shared/types/Qad/SchoolAccount";
+import type {FirstTimeLoginType} from "#shared/types/School/firstTimeLoginType";
 
 export async function storeSchoolAccount(schoolCredentials: SchoolCredentialsType){
     try
@@ -43,10 +43,10 @@ export async function fetchSchoolAccount(page: Ref,search: string,sortColumn: Re
 
 }
 
-export async function editSchoolAccount(sdo_account_id: string | number){
+export async function editSchoolAccount(school_id: string | number){
     try
     {
-        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/school-account/edit/${sdo_account_id}`);
+        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/school-account/edit/${school_id}`);
         return response.data;
     }catch(error:any)
     {
@@ -65,11 +65,27 @@ export async function sdoList(){
     }
 
 }
-export async function updateSchoolAccount(sdo_account_id: string | number,schoolCredentials: SchoolCredentialsType){
+export async function updateSchoolAccount(sdo_account_id: string | number,schoolCredentials: FirstTimeLoginType){
     try
     {
         const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/school-account/update/${sdo_account_id}`,schoolCredentials);
         return response.data.success;
+    }catch(error:any)
+    {
+        throw error.response.data;
+    }
+
+}
+
+export async function viewAttachment(attachment_id?: string | number){
+    try
+    {
+        const response =   await useAxiosDefaultStore().authAxiosInstances().get(`/api/qad/school-account/attachment/${attachment_id}`,{
+            responseType: 'blob'
+        });
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        return URL.createObjectURL(blob);
+
     }catch(error:any)
     {
         throw error.response.data.errors;

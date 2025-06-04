@@ -9,11 +9,11 @@
       <main class="space-y-2 mt-4">
         <div>
           <UFormField label="Email" name="email" :error="error?.email && error?.email[0]" >
-            <UInput  v-model="credentials.email" size="lg" class="w-full m-0" variant="outline" placeholder="Email Address..."
+            <UInput  v-model="credentials.email" size="lg" class="w-full m-0" variant="outline" type="email" placeholder="Email Address..."
             />
 
           </UFormField>
-<!--          <small v-if="error?.email" class="text-red-500">{{ error?.email[0]}}</small>small-->
+
         </div>
         <div>
 

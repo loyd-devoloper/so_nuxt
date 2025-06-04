@@ -39,6 +39,8 @@ Route::middleware(['auth:sanctum','qad'])->prefix('qad')->group(function () {
         Route::post('/update/{school_account_id}', 'update');
         Route::get('/sdo-list', 'sdoList');
         Route::post('/store-bulk', 'storeBulk');
+        Route::get('/attachment/{attachment_id}','viewAttachment');
+
     });
     ################################ CURRICULUM ##########################################################
     Route::controller(QadCurriculumController::class)->prefix('curriculum')->group(function () {
@@ -57,4 +59,11 @@ Route::middleware(['auth:sanctum','qad'])->prefix('school')->group(function () {
     Route::get('schoolInfo',[\App\Http\Controllers\API\School\AuthController::class,'schoolInfo']);
     Route::get('latest/curriculum',[\App\Http\Controllers\API\School\AuthController::class,'latestCurriculum']);
     Route::post('first-time-login',[\App\Http\Controllers\API\School\AuthController::class,'firstTimeLogin']);
+
+    ################################ TRANSACTION ##########################################################
+    Route::get('/active-curricula',[\App\Http\Controllers\API\School\TransactionController::class,'activeCurricula']);
+    Route::controller(\App\Http\Controllers\API\School\TransactionController::class)->prefix('transaction')->group(function () {
+        Route::post('/store', 'storeApplication');
+    });
 });
+

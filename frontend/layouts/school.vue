@@ -99,6 +99,36 @@ const sidebarItem = computed(() => [
     active: route.name == 'School',
     to:{name: 'School'}
 
+  },  {
+    label: 'Transaction',
+    icon: 'icon-park-outline:transaction',
+    active: route.name == 'School-Transaction' || route.name == 'Qad-SDO-Account',
+    defaultOpen: route.name == 'School-Transaction' || route.name == 'Qad-SDO-Account',
+    children:[
+      {
+        label: 'SO Application',
+        icon: 'ph:dot-outline',
+        active: route.name == 'School-Transaction',
+        to: {name: 'School-Transaction'},
+        type:'link',
+      },
+      {
+        label: 'For Releasing',
+        icon: 'ph:dot-outline',
+        active: route.name == 'School-Transaction-For-Releasing',
+        type:'link',
+        to: {name: 'School-Transaction-For-Releasing'},
+
+      },
+      {
+        label: 'Released',
+        icon: 'ph:dot-outline',
+        active: route.name == 'Qad-SDO-Account',
+        type:'link',
+        to: {name: 'School-Transaction-Released'},
+      }
+    ]
+
   },
 
 
