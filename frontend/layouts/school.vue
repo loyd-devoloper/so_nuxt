@@ -36,8 +36,8 @@
       </nav>
 
       <!-- main content -->
-      <section class="px-5 py-5">
-        <UBreadcrumb :items="items">
+      <section class="px-5 py-5 max-h-[calc(100svh-4rem)] overflow-y-auto">
+        <UBreadcrumb :items="breadcrumbs" class="text-xs">
           <template #separator>
             <span class="mx-2 text-muted">/</span>
           </template>
@@ -54,23 +54,38 @@ import type {BreadcrumbItem, DropdownMenuItem} from '@nuxt/ui'
 import {useAuthStore} from "~/stores/AuthStore";
 import First_time_login from "~/components/School/first_time_login.vue";
 
-const route = useRoute();
-const authStore = useAuthStore();
 
-const items: BreadcrumbItem[] = [
-  {
+const authStore = useAuthStore();
+const route = useRoute()
+const router = useRouter()
+
+const breadcrumbs = computed(() => {
+  const paths = route.path.split('/').filter(Boolean)
+  const crumbs = []
+  
+  // Add home breadcrumb
+  crumbs.push({
     label: 'Home',
+    icon: 'i-heroicons-home',
     to: '/'
-  },
-  {
-    label: 'Components',
-    to: '/components'
-  },
-  {
-    label: 'Breadcrumb',
-    to: '/components/breadcrumb'
-  }
-]
+  })
+  
+  // Add dynamic breadcrumbs
+  let accumulatedPath = ''
+  paths.forEach((path) => {
+    accumulatedPath += `/${path}`
+    const routeMatch = router.resolve(accumulatedPath)
+    
+    crumbs.push({
+      label: path.replace(/-/g, ' ').toUpperCase(),
+      to: routeMatch.name ? accumulatedPath : undefined,
+      disabled: !routeMatch.name
+    })
+  })
+  
+  return crumbs
+})
+
 const profile = ref<DropdownMenuItem[][]>([
   [
     {
@@ -102,13 +117,13 @@ const sidebarItem = computed(() => [
   },  {
     label: 'Transaction',
     icon: 'icon-park-outline:transaction',
-    active: route.name == 'School-Transaction' || route.name == 'Qad-SDO-Account',
-    defaultOpen: route.name == 'School-Transaction' || route.name == 'Qad-SDO-Account',
+    active: route.name == 'School-Transaction' || route.name == 'School-Transaction-For-Releasing' || route.name == 'School-Transaction' || route.name == 'School-Transaction-Released' ||  route.name == 'School-Transaction-Students-application_id',
+    defaultOpen: route.name == 'School-Transaction' || route.name == 'School-Transaction-For-Releasing' || route.name == 'School-Transaction' || route.name == 'School-Transaction-Released' ||  route.name == 'School-Transaction-Students-application_id',
     children:[
       {
         label: 'SO Application',
         icon: 'ph:dot-outline',
-        active: route.name == 'School-Transaction',
+        active: route.name == 'School-Transaction' ||  route.name == 'School-Transaction-Students-application_id',
         to: {name: 'School-Transaction'},
         type:'link',
       },

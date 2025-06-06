@@ -150,7 +150,7 @@
                       :error="error?.sec_permit && error?.sec_permit[0]" label="SEC Registration Permit "
                       required>
                     <UInput class="w-full" size="md" type="file" variant="outline"
-
+accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.sec_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.sec_permit?.name }}</small>
                   </UFormField>
@@ -167,6 +167,7 @@
                       :error="error?.shs_provisional_permit && error?.shs_provisional_permit[0]" label="SHS Provisional Permit"
                       required>
                     <UInput class="w-full" size="md" type="file" variant="outline"
+                    accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.shs_provisional_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.shs_provisional_permit?.name }}</small>
                   </UFormField>
@@ -181,8 +182,11 @@
                 <div class="grid grid-cols-2 gap-5 ">
                   <UFormField
                       :error="error?.mayors_permit && error?.mayors_permit[0]" label="Mayor's Permit"
+
+                     
                       required>
                     <UInput class="w-full" size="md" type="file" variant="outline"
+                     accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.mayors_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.mayors_permit?.name }}</small>
                   </UFormField>
@@ -380,18 +384,18 @@ const firstTimeLoginCredential = reactive<FirstTimeLoginType>({
 const show = ref(false)
 const open = ref<boolean>(authStore.authUser?.status !== 'approved')
 
-const schoolPrograms = reactive<{ track: string, track_key: string, strand: string, specialization?: string[] }>({
+const schoolPrograms = reactive<{ track?: string, track_key?: string, strand?: any, specialization?: any }>({
   track: '',
   track_key: '',
   strand: '',
   specialization: []
 })
-const strandArr = ref([]);
+const strandArr = ref<{[key: string]: any;}[]>([]);
 const specializationArr = ref([]);
 watch(() => schoolPrograms.track, (newTrack) => {
   schoolPrograms.strand = '';
   schoolPrograms.specialization = [];
-  const newData = data.value?.programs.find((value) => {
+  const newData = data.value?.programs.find((value:{[key: string]: any;}) => {
     return value.id === newTrack
 
   })

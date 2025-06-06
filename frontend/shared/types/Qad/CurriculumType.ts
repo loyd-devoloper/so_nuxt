@@ -7,12 +7,16 @@ export type CurriculumCredentails = {
     open_date?: string
     closing_date?: string
 }
-interface StrandItem {
-    name?: string;
-    values?: string[];
+interface Strand {
+  name: string;         // No longer optional
+  values: string[];     // No longer optional
 }
+
 export type ProgramsType = {
     track?: string,
     track_key?:string,
-    strand?:StrandItem[]
+    strand: {  // Remove the '?' to make it required
+    name: string;
+    values: string[];
+  }[];
 }

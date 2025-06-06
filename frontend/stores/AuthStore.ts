@@ -5,7 +5,9 @@ import {AccountRoleEnum} from "#shared/enums/AccountRoleEnum";
 
 
 export const useAuthStore = defineStore('authStore', () => {
-    const authUser = ref({});
+    const authUser = ref<{
+[key: string]: any;
+    }>({});
     const logging_out = ref<boolean>(false)
     const axiosDefault = useAxiosDefaultStore();
 
@@ -64,10 +66,10 @@ export const useAuthStore = defineStore('authStore', () => {
             throw error.response;
         }
     }
-    const otpVerification = async (otp: Ref, verification_id: string | RouteParamValue[]) => {
+    const otpVerification = async (otp: Ref, verification_id: string | RouteParamValue[],role: string = 'Qad') => {
         try {
             const response = await axiosDefault.guestAxiosInstance().post(
-                    `/api/auth/otp-verification`, {otp: otp.value.join(''), verification_id: verification_id});
+                    `/api/auth/otp-verification`, {otp: otp.value.join(''), verification_id: verification_id,role: role});
             return response.data;
         } catch (error: any) {
 

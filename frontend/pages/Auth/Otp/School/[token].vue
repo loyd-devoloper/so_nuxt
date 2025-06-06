@@ -62,12 +62,12 @@ const {mutate:fetcOtp,isPending} = useMutation({
 
 const otp = ref<string[]>([]);
 const { mutate: submitOtp, error, isPending: isPendingSubmit} = useMutation({
-  mutationFn: () => authStore.otpVerification(otp, route.params.token || ''),
+  mutationFn: () => authStore.otpVerification(otp, route.params.token || '','School'),
   onSuccess:  (data) => {
      localStorage.setItem("token", data.token);
      localStorage.setItem("role", data.role);
 
-   return  navigateTo({name:'Qad-Dashboard'});
+   return  navigateTo({name:'School'});
   },
   onError: (err: any) => {
 

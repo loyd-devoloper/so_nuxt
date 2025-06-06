@@ -1,4 +1,5 @@
 export type FirstTimeLoginType =  {
+     [key: string]: any; // Add index signature
     school_number?: string;
     sdo_id?: string;
     school_name?: string;
@@ -21,9 +22,9 @@ export type FirstTimeLoginType =  {
     shs_provisional_permit?: File | null;
     mayors_permit?: File | null;
     program_offered?: any;
-    sec_expiration_date?: Date | null;
-    shs_provisional_expiration_date?: Date | null;
-    mayors_permit_expiration_date?: Date | null;
+    sec_expiration_date?: string;
+    shs_provisional_expiration_date?: string;
+    mayors_permit_expiration_date?: string;
 
 
 };

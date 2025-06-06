@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers\API\School;
 
-use App\Http\Controllers\Controller;
-use App\Models\Qad\Curriculum;
-use App\Models\Qad\SchoolAccount;
-use App\Models\School\ProgramOffered;
-use App\Traits\DocumentsTrait;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\Qad\Curriculum;
+use App\Traits\DocumentsTrait;
 use Illuminate\Support\Carbon;
+use App\Models\Qad\SchoolAccount;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use App\Models\Auth\VerificationCode;
+use App\Models\School\ProgramOffered;
+use Illuminate\Support\Facades\Crypt;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -33,8 +35,54 @@ class AuthController extends Controller
         // Check if the school account exists and the password is correct
         if ($school && Hash::check($request->input('password'), $school->password)) {
             // Create a token for the school account
-            $token = $school->createToken('School')->plainTextToken;
-            return response()->json(['token' => $token, 'role' => 'School'], 201);
+            $check = VerificationCode::query()->where('email', $school->school_email_address)->where('user_id', $school->school_number)->orderBy('id', 'desc')->first();
+            $code = rand(100000, 999999);
+            if ($check) {
+
+                if (!!$check->verified_at && $check->status == 1) {
+                    $checkTime =Carbon::parse($check->verified_at)->diffInMinutes( Carbon::now());
+
+                    if ($checkTime > 30) {
+
+                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
+                        return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
+                    } else {
+
+                        $token = $school->createToken('School')->plainTextToken;
+
+                        return response()->json(["token" => $token,'role'=>'School'],201);
+
+                    }
+                }
+                else {
+
+                    $diffSeconds =  Carbon::parse($check->updated_at)->diffInSeconds(Carbon::now());
+
+
+                    $fixMinus = (10 * 60) - $diffSeconds;
+
+                    if ($fixMinus < 0) {
+
+                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
+                    }
+                    return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
+                }
+            } else {
+
+
+                $check = VerificationCode::query()
+                    ->create([
+                    'email' => $school->school_email_address,
+                    'user_id' => $school->school_number,
+                    'code' => $code,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                ]);
+                return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
+
+            }
+            // $token = $school->createToken('School')->plainTextToken;
+            // return response()->json(['token' => $token, 'role' => 'School'], 201);
         }
         return response()->json(['errors' => [
             'school_number' => ['Wrong Credentials']

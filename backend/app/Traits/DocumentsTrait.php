@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Response;
+
 trait DocumentsTrait
 {
     public function storeFile($requestFile, $savingFolder): string
@@ -15,16 +16,25 @@ trait DocumentsTrait
             Storage::makeDirectory($savingFolder);
             chmod(storage_path("app/private/$savingFolder"), 0755); // Set correct permissions
         }
+
         $file = $requestFile;
-        $fileName = $file->getClientOriginalName();
-        $file->storeAs($savingFolder, $fileName);
-        return $savingFolder . "/" . $fileName; //Return Filename to use in saving to DB;
+        $originalFileName = $file->getClientOriginalName();
+        $timestamp = time(); // Get the current timestamp
+        $extension = $file->getClientOriginalExtension(); // Get the file extension
+
+        // Create a new filename with the original name and timestamp
+        $newFileName = pathinfo($originalFileName, PATHINFO_FILENAME) . '_' . $timestamp . '.' . $extension;
+
+        $file->storeAs($savingFolder, $newFileName);
+        return $savingFolder . "/" . $newFileName; // Return Filename to use in saving to DB;
+
     }
 
-    public function addDocument($school_id, $documentName, $path, $expirationDate): void
+    public function addDocument($school_id, $documentName, $path,$application_id = null, $expirationDate = null): void
     {
         Documents::query()->create([
             "school_id" => $school_id,
+             "application_id" => $application_id,
             "document_name" => $documentName,
             "document_file" =>  $path,
             "document_expiry_date" => $expirationDate,

@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
-use App\Models\Qad\SchoolAccount;
-use App\Models\Qad\SdoAccount;
-use App\Models\School\Documents;
-use App\Models\School\ProgramOffered;
-use App\Traits\DocumentsTrait;
 use Illuminate\Http\Request;
+use App\Models\Qad\SdoAccount;
+use App\Traits\DocumentsTrait;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Crypt;
+use App\Models\School\Documents;
+use App\Models\Qad\SchoolAccount;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Models\School\ProgramOffered;
+use Illuminate\Support\Facades\Crypt;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+
 
 class QadSchoolAccountController extends Controller
 {
@@ -26,14 +27,15 @@ class QadSchoolAccountController extends Controller
         return $this->loadFile(
             Documents::class,
             $columnName = "document_file",
-            $id = 1
+            $id = $attachment_id
         );
     }
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request)
     {
+
         $limit = $request->limit ?? 10;
         $search = $request->q ?? '';
         $sortColumn = $request->sort ?? 'id';
@@ -183,14 +185,10 @@ class QadSchoolAccountController extends Controller
                     $school->password = Hash::make($request->input('password'));
                 }
                 $school->save();
-
+                ProgramOffered::query()->where('school_id',$school->id)->delete();
                 foreach ($request->input('program_offered') as $key => $program) {
 
-                    ProgramOffered::query()->updateOrCreate([
-                        'school_id' => $school->id,
-                        'track' => $program['track'],
-                        'strand' => $program['strand'],
-                    ],[
+                    ProgramOffered::query()->create([
                         "school_id" =>$school->id,
                         "track" => $program['track'],
                         "strand" => $program['strand'],

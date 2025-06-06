@@ -56,7 +56,7 @@ export async function updateCurriculum(curriculum_id: string | number,curriculum
 
 }
 
-export async function storeProgram(programData: ProgramsType,curriculum_id: string | number){
+export async function storeProgram(programData: ProgramsType,curriculum_id: string | number | any){
     try
     {
         const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/curriculum/store-program/${curriculum_id}`,programData);

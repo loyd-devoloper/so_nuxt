@@ -22,7 +22,7 @@
             programData?.strand.push({name: '',values: []})
         }">Strand</UButton>
 
-        <div v-for="(strnd,index) in programData.strand" :key="strnd">
+        <div v-for="(strnd,index) in programData.strand" :key="index">
           <UFormField :error="error?.strand && error?.strand[0]" label="Strand" required>
             <UInput
                 v-model="programData.strand[index].name" required class="w-full" size="lg" type="text"
@@ -84,8 +84,11 @@ const programData = reactive<ProgramsType>({
 })
 
 const {mutate: storeProgramFunc, error, isPending} = useMutation({
-  mutationFn: () => storeProgram(programData,route.params.curriculum_id || 0),
+  mutationFn: () => storeProgram(programData,route?.params?.curriculum_id || 0),
   onSuccess: (data) => {
+      programData.track = '';
+    programData.strand = [{name: '', values: []}];  // Fallback
+    programData.track_key = '';
     queryClient.invalidateQueries({queryKey: ["QAD_CURRICULUM_MANAGEMENT_PROGRAM_LIST"]});
     open.value = false;
     toast.add({

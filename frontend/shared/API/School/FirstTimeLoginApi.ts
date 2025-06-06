@@ -36,7 +36,7 @@ export async function firstTimeLogin(credentails: FirstTimeLoginType){
         }
         formData.append('program_offered', JSON.stringify(credentails.program_offered));
         const response =   await useAxiosDefaultStore().authAxiosInstances().post("/api/school/first-time-login",formData);
-        return response.data;
+        return response.data.success;
     }catch(error:any)
     {
         if(error.response.status === 442)

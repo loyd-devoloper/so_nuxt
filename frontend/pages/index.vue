@@ -66,7 +66,7 @@ const {error,mutate:loginFunc,isPending} = useMutation({
       localStorage.setItem("role",  data.data.role);
       navigateTo({name:'School'})
     }else{
-      // navigateTo({name: 'Auth-Otp-token', params: { 'token' : data.data.token}});
+      navigateTo({name: 'Auth-Otp-School-token', params: { 'token' : data.data.token}});
     }
 
   },

@@ -25,14 +25,14 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware(['aut
 Route::middleware(['auth:sanctum','qad'])->prefix('qad')->group(function () {
     Route::get('/userInfo', [AuthController::class, 'qadInfo']);
     ################################## SDO ACCOUNT ########################################################
-    Route::controller(\App\Http\Controllers\API\QadSdoAccountController::class)->prefix('sdo-account')->group(function () {
+    Route::controller(QadSdoAccountController::class)->prefix('sdo-account')->group(function () {
         Route::get('/', 'index');
         Route::post('/store','store');
         Route::get('/edit/{sdo_account_id}','edit');
         Route::post('/update/{sdo_account_id}','update');
     });
     ################################ SCHOOL ACCOUNT ##########################################################
-    Route::controller(\App\Http\Controllers\API\QadSchoolAccountController::class)->prefix('school-account')->group(function () {
+    Route::controller(QadSchoolAccountController::class)->prefix('school-account')->group(function () {
         Route::get('/', 'index');
         Route::post('/store', 'store');
         Route::get('/edit/{school_account_id}', 'show');
@@ -64,6 +64,8 @@ Route::middleware(['auth:sanctum','qad'])->prefix('school')->group(function () {
     Route::get('/active-curricula',[\App\Http\Controllers\API\School\TransactionController::class,'activeCurricula']);
     Route::controller(\App\Http\Controllers\API\School\TransactionController::class)->prefix('transaction')->group(function () {
         Route::post('/store', 'storeApplication');
+        Route::get('/', 'index');
+         Route::get('/students/{application_id}', 'indexStudents');
     });
 });
 

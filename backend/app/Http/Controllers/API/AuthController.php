@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use App\Models\Qad\SchoolAccount;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
@@ -102,6 +102,7 @@ class AuthController extends Controller
     public function verifyOtp(Request $request): \Illuminate\Http\JsonResponse|array
     {
 
+
         $validator = Validator::make($request->all(), [
             "otp" => "required",
         ]);
@@ -114,14 +115,31 @@ class AuthController extends Controller
             ->first();
         if($otp->code == $request->otp)
         {
-            $user = User::query()->where('id', $otp->user_id)->first();
-            $token = $user->createToken('Qad')->plainTextToken;
+
+            if($request->input('role') === 'Qad')
+            {
+
+                $user = User::query()->where('id', $otp->user_id)->first();
+                $token = $user->createToken('Qad')->plainTextToken;
+                $otp->update([
+                    'code' => null,
+                    'verified_at'=>Carbon::now(),
+                    'status'=>1
+                ]);
+            return response()->json(["token" => $token,"role"=>'Qad'],200);
+            }
+             if($request->input('role') === 'School')
+            {
+                $school = SchoolAccount::query()->where('school_number', $otp->user_id)->first();
+
+            $token = $school->createToken('School')->plainTextToken;
             $otp->update([
                 'code' => null,
                 'verified_at'=>Carbon::now(),
                 'status'=>1
             ]);
-            return response()->json(["token" => $token,"role"=>'Qad'],200);
+            return response()->json(["token" => $token,"role"=>'School'],200);
+            }
         }
         return response()->json(['errors' => ['otp' => ['Invalid OTP']]], 401);
     }

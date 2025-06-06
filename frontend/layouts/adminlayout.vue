@@ -16,7 +16,12 @@
       </header>
       <div class=" px-2">
 
-        <UNavigationMenu :items="sidebarItem" class="data-[orientation=vertical]" default-value="1"
+        <UNavigationMenu :items="sidebarItem" class="data-[orientation=vertical] " :ui="{
+          list: 'space-y-1',
+         link: 'text-base'
+
+          
+        }" default-value="1"
                          orientation="vertical"/>
       </div>
     </aside>
@@ -35,7 +40,7 @@
 
       <!-- main content -->
       <section class="px-5 py-5">
-        <UBreadcrumb :items="items">
+        <UBreadcrumb :items="breadcrumbs" class="text-xs">
           <template #separator>
             <span class="mx-2 text-muted">/</span>
           </template>
@@ -52,22 +57,35 @@ import type {BreadcrumbItem, DropdownMenuItem,NavigationMenuItem} from '@nuxt/ui
 import {useAuthStore} from "~/stores/AuthStore";
 
 const route = useRoute();
-const authStore = useAuthStore();
 
-const items: BreadcrumbItem[] = [
-  {
+const router = useRouter();
+const authStore = useAuthStore();
+const breadcrumbs = computed(() => {
+  const paths = route.path.split('/').filter(Boolean)
+  const crumbs = []
+  
+  // Add home breadcrumb
+  crumbs.push({
     label: 'Home',
+    icon: 'i-heroicons-home',
     to: '/'
-  },
-  {
-    label: 'Components',
-    to: '/components'
-  },
-  {
-    label: 'Breadcrumb',
-    to: '/components/breadcrumb'
-  }
-]
+  })
+  
+  // Add dynamic breadcrumbs
+  let accumulatedPath = ''
+  paths.forEach((path) => {
+    accumulatedPath += `/${path}`
+    const routeMatch = router.resolve(accumulatedPath)
+    
+    crumbs.push({
+      label: path.replace(/-/g, ' ').toUpperCase(),
+      to: routeMatch.name ? accumulatedPath : undefined,
+      disabled: !routeMatch.name
+    })
+  })
+  
+  return crumbs
+})
 const profile = ref<DropdownMenuItem[][]>([
   [
     {
@@ -83,7 +101,7 @@ const profile = ref<DropdownMenuItem[][]>([
       label: 'Logout',
       icon: 'material-symbols:logout-rounded',
       onSelect: () => {
-        authStore.logout(localStorage.getItem('role'))
+        authStore.logout(localStorage.getItem('role') || 'qad')
       },
     }
   ],
@@ -94,7 +112,8 @@ const sidebarItem = computed(() => [
     label: 'Dashboard',
     icon: 'material-symbols-light:dashboard-rounded',
     active: route.name == 'Qad-Dashboard',
-    to:{name: 'Qad-Dashboard'}
+    to:{name: 'Qad-Dashboard'},
+
 
   },
   {
@@ -131,6 +150,6 @@ const sidebarItem = computed(() => [
 
   },
 
-])
+] as NavigationMenuItem[])
 
 </script>

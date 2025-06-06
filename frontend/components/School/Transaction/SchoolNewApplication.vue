@@ -6,13 +6,11 @@
         <form ref="newSdoAccount" @submit.prevent="storeApplicationFunc()">
           <main class=" space-y-1">
 
-            <UFormField :error="error?.status && error?.status[0]" label="School Year" required>
+            <UFormField :error="error?.curriculum_id && error?.curriculum_id[0]" label="School Year" required>
               <USelectMenu
                   v-model="school_year"
                   :filter-fields="['track', 'strand']"
                   :items="activeCurriculum"
-                  :loading="status === 'pending'"
-
                   :multiple="false"
                   :required="true" class="w-full" size="md">
                 <template #leading="{ modelValue }">
@@ -32,7 +30,6 @@
 
                   :filter-fields="['track', 'strand']"
                   :items="authStore.authUser.program_offered"
-                  :loading="status === 'pending'"
                   v-model="track"
                   :multiple="false"
                   :required="true" class="w-full" size="md">
@@ -64,12 +61,14 @@
             <UFormField :error="error?.attestation_file && error?.attestation_file[0]" label="Attestation File" required>
               <UInput
 accept="application/pdf,application/vnd.ms-excel"
+  @change="(e: Event) => (applicationData.attestation_file = (e.target as HTMLInputElement).files?.[0] || null)"
                       class="w-full"
                       size="lg" type="file" variant="outline"/>
             </UFormField>
-            <UFormField :error="error?.form9_file && error?.form9_file[0]" label="Form 9" required>
+            <UFormField :error="error?.form_9_file && error?.form_9_file[0]" label="Form 9" required>
               <UInput  accept="application/pdf,application/vnd.ms-excel"
                       class="w-full"
+                      @change="(e: Event) => (applicationData.form_9_file = (e.target as HTMLInputElement).files?.[0] || null)"
                       size="lg" type="file" variant="outline"/>
             </UFormField>
             <UFormField :error="error?.students_file && error?.students_file[0]" hint="Excel File" label="Students File" required>
@@ -77,6 +76,7 @@ accept="application/pdf,application/vnd.ms-excel"
                       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                       class="w-full"
                       size="lg"
+                      @change="(e: Event) => (applicationData.students_file = (e.target as HTMLInputElement).files?.[0] || null)"
                       type="file" variant="outline"/>
             </UFormField>
             <UFormField :error="error?.graduation_date && error?.graduation_date[0]" label="Graduation Date" required>
@@ -93,7 +93,7 @@ accept="application/pdf,application/vnd.ms-excel"
 
         </form>
       </template>
-      <UButton color="secondary" icon="basil:add-outline" label="Create Sdo Account" size="md" type="button"
+      <UButton color="secondary" icon="basil:add-outline" label="New Application" size="md" type="button"
                variant="solid"/>
     </UModal>
 
@@ -102,7 +102,6 @@ accept="application/pdf,application/vnd.ms-excel"
 </template>
 <script lang="ts" setup>
 import {useMutation} from '@tanstack/vue-query'
-import {storeSdoAccount} from "#shared/API/Qad/SdoAccountApi";
 import {useAuthStore} from "~/stores/AuthStore";
 import type {NewApplicationType} from "#shared/types/School/SchoolApplicationType";
 import {fetchActiveCurriculum, storeApplication} from "#shared/API/School/TransactionApi";
@@ -111,8 +110,8 @@ const open = ref<boolean>(false)
 const toast = useToast()
 const authStore = useAuthStore()
 const queryClient = useQueryClient();
-const school_year = ref<any>({});
-const track = ref('');
+const school_year = ref<{[key: string]: any;} | null>(null);
+const track = ref<{[key: string]: any;} | null>(null);
 const specialization = ref<string[] | number[]>([]);
 const applicationData = reactive<NewApplicationType>({
   applied_specialization: []
@@ -124,8 +123,19 @@ const {data:activeCurriculum} = useQuery({
 const {mutate: storeApplicationFunc, error, isPending} = useMutation({
   mutationFn: () => storeApplication(applicationData),
   onSuccess: (data) => {
-
+    queryClient.invalidateQueries({queryKey:['SCHOOL_TRANSACTION']})
     open.value = false;
+    applicationData.applied_specialization = [];
+    applicationData.applied_strand = '';
+    applicationData.applied_track = '';
+    applicationData.curriculum_id = '';
+    applicationData.attestation_file = null;
+    applicationData.form_9_file = null;
+    applicationData.students_file = null;
+    applicationData.graduation_date = '';
+    school_year.value = null;
+    track.value = null;
+    specialization.value = [];
     toast.add({
       title: data,
       color: 'success',
@@ -141,10 +151,12 @@ watch(() => track.value, (newData) => {
 
   applicationData.applied_strand = newData?.strand;
   applicationData.applied_track = newData?.track;
+   applicationData.applied_specialization = [];
   specialization.value = newData?.specialization;
+  
 
 })
 watch(() => school_year.value,(newValue) =>{
-  applicationData.curriculum_id = newValue.id;
+  applicationData.curriculum_id = newValue?.id;
 })
 </script>

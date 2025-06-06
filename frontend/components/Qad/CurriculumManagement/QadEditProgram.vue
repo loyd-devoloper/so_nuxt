@@ -18,11 +18,9 @@
                 variant="outline"/>
           </UFormField>
         </div>
-        <UButton icon="mdi:plus" size="sm" color="primary" variant="solid" @click="() =>{
-            programData?.strand.push({name: '',values: []})
-        }">Strand</UButton>
+        <UButton icon="mdi:plus" size="sm" color="primary" variant="solid" @click="() => { programData.strand.push({name: '', values: []}); }">Strand</UButton>
 
-        <div v-for="(strnd,index) in programData.strand" :key="strnd">
+        <div v-if="programData.strand" v-for="(strnd,index) in programData.strand" :key="index">
           <UFormField :error="error?.strand && error?.strand[0]" label="Strand" required>
             <UInput
                 v-model="programData.strand[index].name" required class="w-full" size="lg" type="text"
@@ -30,7 +28,7 @@
           </UFormField>
           <div class="flex justify-end">
             <UButton size="xs" color="success" icon="mdi:plus" @click="() =>{
-               programData.strand[index].values.push('')
+               programData.strand[index].values?.push('')
             }"> Specialization</UButton>
 
             <UIcon
@@ -50,7 +48,7 @@
             </UFormField>
             <UIcon
                 name="ic:baseline-delete" class="text-red-500 cursor-pointer" size="1.25rem" title="Delete Specialization" @click="() =>{
-              programData.strand[index].values.splice(index,1)
+              programData.strand[index].values?.splice(index,1)
             }"/>
           </div>
         </div>
@@ -73,6 +71,7 @@ import {useMutation} from '@tanstack/vue-query'
 import type {ProgramsType} from "#shared/types/Qad/CurriculumType";
 import {editProgram, storeProgram, updateProgram} from "#shared/API/Qad/CurriculumManagementApi";
 
+
 const toast = useToast()
 const open = ref<boolean>(false)
 const queryClient = useQueryClient();
@@ -88,9 +87,9 @@ const {mutate} = useMutation({
   mutationFn: () => editProgram(props.curriculum_id,props.program_id),
   onSuccess:(data) =>{
 
-      programData.track = data.track;
-      programData.strand = data.strand;
-      programData.track_key = data.track_key;
+       programData.track = data.track || '';
+    programData.strand = data.strand || [{name: '', values: []}];  // Fallback
+    programData.track_key = data.track_key || '';
   }
 })
 

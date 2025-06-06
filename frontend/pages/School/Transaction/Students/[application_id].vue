@@ -8,7 +8,7 @@
 
             <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." size="md" type="search"
                     variant="outline"/>
-            <SchoolNewApplication/>
+
 
 
         </div>
@@ -21,31 +21,32 @@
             <th class="px-6 py-3 " scope="col">
 
               <div class="flex items-center gap-2">
-                School Year
+                LRN
                 <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
-                       @click="sortColumn('school_year_end')"/>
+                       @click="sortColumn('lrn')"/>
               </div>
             </th>
             <th class="px-6 py-3" scope="col">
               <div class="flex items-center gap-2">
-                Applied Track
+                Student Name
                 <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
-                       @click="sortColumn('applied_track')"/>
+                       @click="sortColumn('last_name')"/>
               </div>
             </th>
             <th class="px-6 py-3" scope="col">
-              Applied Strand
+              Email Address
             </th>
                <th class="px-6 py-3" scope="col">
-              Applied Specialization
+              Contact Number
+            </th>
+                    
+               <th class="px-6 py-3" scope="col">
+              Birth Date
             </th>
             <th class="px-6 py-3" scope="col">
               Status
             </th>
-            <th class="px-6 py-3" scope="col">
-              No. of Student
-
-            </th>
+ 
 
             <th class="px-6 py-3" scope="col">
               Action
@@ -68,60 +69,45 @@
             </td>
           </tr>
           <tr
-              v-for="application in data?.data" v-show="!isLoading" :key="application.id"
+              v-for="student in data?.data" v-show="!isLoading" :key="student.id"
               class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
             <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-              {{ application?.curriculum_info?.school_year_start +' - '+application?.curriculum_info?.school_year_end }}
+              {{ student.lrn }}
             </th>
             <td class="px-6 py-4">
-              {{ application?.applied_track }}
+              {{ `${student?.first_name} ${student?.middle_name} ${student?.last_name}` }}
             </td>
             <td class="px-6 py-4">
-              {{ application?.applied_strand }}
+              {{ student?.email_address }}
             </td>
             <td class="px-6 py-4">
-              <li v-for="spec in JSON.parse(application?.applied_specialization) ?? []" :key="spec">{{ spec }}</li>
+            {{ student?.contact_number }}
+            </td>
+              <td class="px-6 py-4">
+            {{ student?.birth_date }}
             </td>
                <td class="px-6 py-4">
               <div class="flex items-center">
                 <div
              
                     :class="{
-                      'bg-green-500': application?.status === 'approved',
-                      'bg-amber-500': application?.status === 'pending',
-                      'bg-blue-500': application?.status === 'onprocess',
-                              'bg-purple-500': application?.status === 'releasing',
-                      'bg-cyan-500': application?.status === 'for_claim',
-                      'bg-emerald-500': application?.status === 'released',
+                      'bg-green-500': student?.status === 'approved',
+                      'bg-amber-500': student?.status === 'pending',
+                      'bg-blue-500': student?.status === 'onprocess',
+                              'bg-purple-500': student?.status === 'releasing',
+                      'bg-cyan-500': student?.status === 'for_claim',
+                      'bg-emerald-500': student?.status === 'released',
                     }"
                     class="h-2.5 w-2.5 rounded-full me-2 "/>
-                <span class="capitalize">{{ application?.status }}</span>
+                <span class="capitalize">{{ student?.status }}</span>
               </div>
 
             </td>
-            <td class="px-6 py-4">
-              <UBadge color="info">{{ application?.students_count }}</UBadge>
-            </td>
+   
          
          
             <td class="px-6 py-4">
-             <UDropdownMenu
-    :items="items(application.id)"
-
-    size="xs"
-    :content="{
-      align: 'start',
-      side: 'bottom',
-      sideOffset: 8
-    }"
-    :ui="{
-      content: 'w-auto',
-
-    }"
-  >
-    <UButton label="Action" size="sm" icon="i-lucide-menu" color="neutral" variant="outline" />
- 
-  </UDropdownMenu>
+          
             </td>
           </tr>
 
@@ -143,8 +129,8 @@ definePageMeta({
   layout: 'school',
 });
 import debounce from 'lodash.debounce'
-import SchoolNewApplication from "~/components/School/Transaction/SchoolNewApplication.vue";
-import { fetchSchoolApplication } from '~/shared/API/School/TransactionApi';
+
+import {  fetchSoStudents } from '~/shared/API/School/TransactionApi';
 import type { DropdownMenuItem } from '@nuxt/ui'
 const items = (id: string): DropdownMenuItem[] => [
   {
@@ -158,8 +144,8 @@ const items = (id: string): DropdownMenuItem[] => [
   {
     label: 'Students',
     to: { 
-      name: 'School-Transaction-Students-application_id',
-      params: { application_id: id } // Using the dynamic value here
+      name: 'School-Transaction-Students-student_id',
+      params: { student_id: id } // Using the dynamic value here
     },
     icon: 'hugeicons:students'
   }
@@ -168,17 +154,17 @@ const route = useRoute();
 const queryClient = useQueryClient();
 const page = ref<number>(parseInt(route?.query?.page as string) || 1);
 const search = ref<string>('');
-const sort = ref<string>('')
+const sort = ref<string>('last_name')
 const direction = ref<string>('asc')
 const {data,isLoading} = useQuery({
-  queryKey: ['SCHOOL_TRANSACTION', page,direction],
-  queryFn: () => fetchSchoolApplication(page, search.value,sort,direction),
+  queryKey: ['SCHOOL_TRANSACTION_STUDENTS', page,direction],
+  queryFn: () => fetchSoStudents(page, search.value,sort,direction,route?.params?.application_id),
 })
 watch(() => search.value, debounce(() => {
-  queryClient.invalidateQueries({queryKey: ["SCHOOL_TRANSACTION"]});
+  queryClient.invalidateQueries({queryKey: ["SCHOOL_TRANSACTION_STUDENTS"]});
 }, 300))
 watch(() => page.value, (page) => {
-  navigateTo({name: 'School-Transaction', query: {page: page}})
+  navigateTo({name: 'School-Transaction-Students-application_id',params: {application_id:route?.params?.application_id}, query: {page: page}})
 })
 const sortColumn = (column:string) =>{
   direction.value = direction.value === 'asc' ? 'desc' : 'asc';
