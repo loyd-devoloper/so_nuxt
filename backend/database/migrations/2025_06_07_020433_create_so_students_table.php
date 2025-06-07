@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('so_application_id');
             $table->unsignedBigInteger('curriculum_id');
             $table->integer('so_number')->nullable();
-            $table->string('lrn')->unique()->nullable();
+            $table->string('lrn')->nullable();
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
             $table->string('middle_name')->nullable();

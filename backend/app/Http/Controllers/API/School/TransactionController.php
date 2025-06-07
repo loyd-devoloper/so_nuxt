@@ -82,7 +82,7 @@ class TransactionController extends Controller
                             break;
                         } else {
                             SoStudent::query()->create([
-                                "school_id" =>$user->school_number,
+                                "school_id" => $user->school_number,
                                 "so_application_id" => $application->id,
                                 "curriculum_id" => $request->curriculum_id,
                                 "first_name" => $row[1],
@@ -115,36 +115,156 @@ class TransactionController extends Controller
         $sortColumn = $request->sort ?? 'id';
         $sortDirection = $request->d ?? 'asc';
         $schoolSoApplications = SoApplication::query()
-        ->with('curriculumInfo')
-        ->withCount('students')
-        ->where(function($query) use ($search){
-               $query->where('applied_strand', 'like', "%{$search}%")
-                            ->orWhere('applied_track', 'like', "%{$search}%")
-                            ->orWhere('applied_specialization', 'like', "%{$search}%")
-                            ->orWhere('status', 'like', "%{$search}%")
-                            ->orWhereHas('curriculumInfo',function($query) use($search){
-                               $query->where('school_year_start', 'like', '%' . $search . '%');
-                                     $query->where('school_year_end', 'like', '%' . $search . '%');
-                            });
-        })->orderBy($sortColumn, $sortDirection)->paginate($limit);
+            ->with('curriculumInfo')
+            ->withCount('students')
+            ->where(function ($query) use ($search) {
+                $query->where('applied_strand', 'like', "%{$search}%")
+                    ->orWhere('applied_track', 'like', "%{$search}%")
+                    ->orWhere('applied_specialization', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('curriculumInfo', function ($query) use ($search) {
+                        $query->where('school_year_start', 'like', '%' . $search . '%');
+                        $query->where('school_year_end', 'like', '%' . $search . '%');
+                    });
+            })->orderBy($sortColumn, $sortDirection)->paginate($limit);
         return response()->json($schoolSoApplications, 200);
     }
 
-      public function indexStudents(Request $request,$application_id): \Illuminate\Http\JsonResponse
+    public function indexStudents(Request $request, $application_id): \Illuminate\Http\JsonResponse
     {
         $search = trim($request->q);
         $limit = $request->limit ?? 10;
         $sortColumn = $request->sort ?? 'id';
         $sortDirection = $request->d ?? 'asc';
         $students = SoStudent::query()
-        ->where('so_application_id',$application_id)
-        ->where(function($query) use ($search){
-               $query->where('lrn', 'like', "%{$search}%")
-                            ->orWhere('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
-                            ->orWhere('middle_name', 'like', "%{$search}%")
-                            ->orWhere('status', 'like', "%{$search}%");
-        })->orderBy($sortColumn, $sortDirection)->paginate($limit);
+            ->where('so_application_id', $application_id)
+            ->where(function ($query) use ($search) {
+                $query->where('lrn', 'like', "%{$search}%")
+                    ->orWhere('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+            })->orderBy($sortColumn, $sortDirection)->paginate($limit);
         return response()->json($students, 200);
+    }
+
+    public function storeStudent(Request $request, $application_id)
+    {
+        $validator = Validator::make($request->all(), [
+            "first_name" => "required",
+
+            "last_name" => "required",
+            "lrn" => "required",
+
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $soApplication = SoApplication::query()->where('id', $application_id)->first();
+        SoStudent::query()
+            ->create([
+                "school_id" => $request->user()->school_number,
+                "so_application_id" => $application_id,
+                "curriculum_id" => $soApplication->curriculum_id,
+                "first_name"    => $request->input('first_name'),
+                "middle_name"   => $request->input('middle_name'),
+                "last_name"     => $request->input('last_name'),
+                "suffix"        => $request->input('suffix'),
+                "lrn"           => $request->input('lrn'),
+            ]);
+        return response()->json(["success" => "Student Created Successfully"], 201);
+    }
+
+    public function showStudent($student_id)
+    {
+        return response()->json(SoStudent::query()->where('id', $student_id)->first(), 200);
+    }
+    public function updateStudent(Request $request, $student_id)
+    {
+        $validator = Validator::make($request->all(), [
+            "first_name" => "required",
+
+            "last_name" => "required",
+            "lrn" => "required",
+
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        SoStudent::query()
+            ->where('id', $student_id)
+            ->update([
+
+                "first_name"    => $request->input('first_name'),
+                "middle_name"   => $request->input('middle_name'),
+                "last_name"     => $request->input('last_name'),
+                "suffix"        => $request->input('suffix'),
+                "lrn"           => $request->input('lrn'),
+            ]);
+        return response()->json(["success" => "Student Updated Successfully"], 200);
+    }
+
+    public function storeStudentBulk(Request $request,$application_id)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xls,xlsx,csv',
+        ]);
+        try {
+            $user = $request->user();
+            $school = $user->schoolBelong;
+
+            $folder = "school_docs/{$user->school_number}/transaction/" . now()->format('Y-m-d_H-i-s');
+            $file_path = $this->storeFile($request->file('excel_file'), $folder);
+            if (!$file_path) {
+                return response()->json(["message" => "Something went wrong saving the file."], 400);
+            }
+            $spreadsheet = IOFactory::load(storage_path('app/private/' . $file_path));
+            $rows = $spreadsheet->getSheet(0)->toArray();
+            $application = SoApplication::query()->where('id',$application_id)->first();
+
+            $skippedEntries = [];
+            foreach ($rows as $index => $row) {
+                if ($index < 2) continue; // Skip header rows
+                if (empty($row[1])) break;
+                $lrn = trim($row[5]);
+                if (empty($lrn)) {
+                    $skippedEntries[] = "Row " . ($index + 1) . ": LRN is empty.";
+                    continue;
+                }
+                if (SoStudent::query()->where('so_application_id',$application_id)->where('lrn', $lrn)->exists()) {
+                    $skippedEntries[] = "Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'";
+                    continue;
+                }
+                try {
+                    SoStudent::query()->create([
+                        "school_id"         => $user->school_number,
+                        "so_application_id" => $application_id,
+                        "curriculum_id"     => $application->curriculum_id,
+                        "first_name"        => trim($row[1]),
+                        "middle_name"       => trim($row[2] ?? ''),
+                        "last_name"         => trim($row[3]),
+                        "suffix"            => trim($row[4] ?? ''),
+                        "lrn"               => $lrn,
+                    ]);
+                } catch (\Exception $e) {
+                    $skippedEntries[] = "Row " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+            // $this->saveDocument($school->id, $application_id, 'Student File', $file_path);
+
+            return response()->json([
+                "message" => "Students successfully uploaded.",
+                "skipped" => $skippedEntries
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 500);
+        }
     }
 }

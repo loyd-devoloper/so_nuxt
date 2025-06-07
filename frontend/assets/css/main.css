@@ -8,4 +8,10 @@
 .active___button{
     @apply bg-red-50 text-red-400 font-medium;
 }
-
+@theme static {
+    --ui-color-primary-500: #EF1A21;
+}
+:root {
+  --ui-primary: var(--ui-color-primary-500);
+  
+}

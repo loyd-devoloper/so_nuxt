@@ -17,16 +17,16 @@
       <div class=" px-2">
 
         <UNavigationMenu :items="sidebarItem" class="data-[orientation=vertical] " :ui="{
-          list: 'space-y-1',
-         link: 'text-base'
-
-          
-        }" default-value="1"
+            list: 'space-y-1',
+            link: 'text-sm py-2.5 font-normal text-muted data-active:font-bold  data-active:before:bg-red-500 data-active:rounded-lg data-active:text-white',
+            linkLeadingIcon: 'group-data-active:bg-white',
+            childList: 'py-1'
+          }" default-value="1"
                          orientation="vertical"/>
       </div>
     </aside>
 
-    <main class="  w-full max-w-[calc(100svw-15rem)]">
+    <main class=" w-full max-w-[calc(100svw-15rem)]">
       <nav class="bg-white h-[4rem] border-b border-black/10 flex justify-end items-center px-4  ">
         <UDropdownMenu
             :items="profile"
@@ -39,7 +39,7 @@
       </nav>
 
       <!-- main content -->
-      <section class="px-5 py-5">
+      <section class="px-5 py-5 max-h-[calc(100svh-4rem)] overflow-y-auto">
         <UBreadcrumb :items="breadcrumbs" class="text-xs">
           <template #separator>
             <span class="mx-2 text-muted">/</span>
@@ -62,26 +62,30 @@ const router = useRouter();
 const authStore = useAuthStore();
 const breadcrumbs = computed(() => {
   const paths = route.path.split('/').filter(Boolean)
-  const crumbs = []
+  const crumbs:any = []
   
   // Add home breadcrumb
-  crumbs.push({
-    label: 'Home',
-    icon: 'i-heroicons-home',
-    to: '/'
-  })
+  // crumbs.push({
+  //   label: 'Home',
+  //   icon: 'i-heroicons-home',
+  //   to: '/'
+  // })
   
   // Add dynamic breadcrumbs
   let accumulatedPath = ''
   paths.forEach((path) => {
     accumulatedPath += `/${path}`
     const routeMatch = router.resolve(accumulatedPath)
-    
-    crumbs.push({
-      label: path.replace(/-/g, ' ').toUpperCase(),
-      to: routeMatch.name ? accumulatedPath : undefined,
+
+    if(path !== 'Dashboard')
+  {
+       crumbs.push({
+      label: path.replace(/-/g, ' ').toUpperCase() === 'QAD' ? 'Home' : path.replace(/-/g, ' '),
+       icon: path.replace(/-/g, ' ').toUpperCase() === 'QAD' ? 'i-heroicons-home' : '',
+      to: path.replace(/-/g, ' ').toUpperCase() === 'QAD' ? {name: 'Qad-Dashboard'} : routeMatch.name ? accumulatedPath : undefined,
       disabled: !routeMatch.name
     })
+  }
   })
   
   return crumbs
@@ -147,6 +151,13 @@ const sidebarItem = computed(() => [
     icon: 'streamline:quality-education',
     active: route.name == 'Qad-Curriculum-Management' || route.name == 'Qad-Curriculum-Management-Programs-curriculum_id',
     to:{name: 'Qad-Curriculum-Management'}
+
+  },
+   {
+    label: 'Transaction',
+    icon: 'streamline:quality-education',
+    active: route.name == 'Qad-Transaction' ,
+    to:{name: 'Qad-Transaction'}
 
   },
 

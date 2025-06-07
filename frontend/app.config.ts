@@ -1,7 +1,8 @@
 export default defineAppConfig({
   ui: {
     colors: {
-      primary: 'red',
+      primary: '#ff0000',
+  
      
     },
     modal:{

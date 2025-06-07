@@ -26,7 +26,20 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   ui: {
     fonts: true,
-    colorMode: false
+    colorMode: false,
+    theme:{
+     
+      colors: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'info',
+        'success',
+        'warning',
+        'error',
+      ]
+    }
+  
   },
   vite: {
     plugins: [

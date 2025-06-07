@@ -10,3 +10,12 @@ export type NewApplicationType =  {
     applied_specialization?: string[] | number[]
 
 };
+
+export type StudentType = {
+    [key: string] : any;
+    last_name?: string;
+    first_name?:string;
+    middle_name?: string;
+        suffix?: string;
+    lrn?:string;
+}

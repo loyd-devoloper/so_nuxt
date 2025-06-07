@@ -1,18 +1,21 @@
 <template>
 
-  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-    <UCard>
-      <template #header>
-        <div class="flex justify-end items-center gap-2">
+  <div class="relative overflow-x-auto shadow-md  sm:rounded-lg">
+    <UCard class="shadow-none border border-muted drop-shadow-none">
+          <template #header class="pb-4" >
+        <div class="flex justify-between items-center gap-2">
 
 
-            <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." size="md" type="search"
+            <UInput v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
                     variant="outline"/>
-
-
+          <div class="flex items-center gap-2">
+            <SchoolTransactionSchoolNewStudent/>
+          <SchoolBulkStudent/>
+          </div>
 
         </div>
       </template>
+
 
       <div class="overflow-x-auto">
         <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
@@ -28,20 +31,24 @@
             </th>
             <th class="px-6 py-3" scope="col">
               <div class="flex items-center gap-2">
-                Student Name
+                First Name
+                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                       @click="sortColumn('first_name')"/>
+              </div>
+            </th>
+            <th class="px-6 py-3" scope="col">
+              Middle NAME
+            </th>
+               <th class="px-6 py-3" scope="col">
+            <div class="flex items-center gap-2">
+                Last Name
                 <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('last_name')"/>
               </div>
             </th>
-            <th class="px-6 py-3" scope="col">
-              Email Address
-            </th>
-               <th class="px-6 py-3" scope="col">
-              Contact Number
-            </th>
                     
                <th class="px-6 py-3" scope="col">
-              Birth Date
+              Suffix
             </th>
             <th class="px-6 py-3" scope="col">
               Status
@@ -75,16 +82,16 @@
               {{ student.lrn }}
             </th>
             <td class="px-6 py-4">
-              {{ `${student?.first_name} ${student?.middle_name} ${student?.last_name}` }}
+              {{ student?.first_name }}
             </td>
             <td class="px-6 py-4">
-              {{ student?.email_address }}
+              {{ student?.middle_name }}
             </td>
             <td class="px-6 py-4">
-            {{ student?.contact_number }}
+            {{ student?.last_name }}
             </td>
               <td class="px-6 py-4">
-            {{ student?.birth_date }}
+            {{ student?.suffix }}
             </td>
                <td class="px-6 py-4">
               <div class="flex items-center">
@@ -107,7 +114,7 @@
          
          
             <td class="px-6 py-4">
-          
+                <SchoolTransactionSchoolEditStudent :student_id="student.id"/>
             </td>
           </tr>
 
@@ -116,8 +123,8 @@
       </div>
 
      <UPagination
-         v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
-         class="pt-10  w-fit mx-auto" show-edges/>
+         v-model:page="page" :items-per-page="data?.per_page" :sibling-count="0" :total="data?.total"
+         class="pt-10  w-fit mx-auto" show-edges />
 
     </UCard>
 
@@ -132,6 +139,7 @@ import debounce from 'lodash.debounce'
 
 import {  fetchSoStudents } from '~/shared/API/School/TransactionApi';
 import type { DropdownMenuItem } from '@nuxt/ui'
+import SchoolBulkStudent from '~/components/School/Transaction/SchoolBulkStudent.vue';
 const items = (id: string): DropdownMenuItem[] => [
   {
     label: 'Profile',
@@ -157,7 +165,7 @@ const search = ref<string>('');
 const sort = ref<string>('last_name')
 const direction = ref<string>('asc')
 const {data,isLoading} = useQuery({
-  queryKey: ['SCHOOL_TRANSACTION_STUDENTS', page,direction],
+  queryKey: ['SCHOOL_TRANSACTION_STUDENTS', page,direction,route?.params?.application_id],
   queryFn: () => fetchSoStudents(page, search.value,sort,direction,route?.params?.application_id),
 })
 watch(() => search.value, debounce(() => {

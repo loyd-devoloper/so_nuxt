@@ -3,6 +3,7 @@
 namespace App\Models\School;
 
 use App\Models\Qad\Curriculum;
+use App\Models\Qad\SchoolAccount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -40,5 +41,9 @@ class SoApplication extends Model
     public function students(): HasMany
     {
         return $this->hasMany(SoStudent::class,'so_application_id','id');
+    }
+     public function schoolInfo(): HasOne
+    {
+        return $this->hasOne(SchoolAccount::class,'school_number','school_id');
     }
 }

@@ -3,7 +3,7 @@
     position: 'top-right',
   }">
 
-    <main class="bg-gray-100 min-h-screen w-full">
+    <main class="bg-[#ffffff00] min-h-screen w-full">
       <NuxtLayout>
       <NuxtPage />
       </NuxtLayout>
