@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Mail\Otp;
 use App\Models\Auth\VerificationCode;
 use App\Models\User;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -34,36 +35,36 @@ class AuthController extends Controller
         $result = json_decode($apiData);
 
         if ($result->status == "200" && strtolower($result->data->account_status) == "enabled") {
-              $user =  User::query()->updateOrCreate(['username'=>$result->data->username,'email'=>$result->data->email],[
-                    "email" => $result->data->email,
-                    "password" =>$result->data->password,
-                    "fname" =>Crypt::encryptString($result->data->fname),
-                    "lname" => Crypt::encryptString($result->data->lname),
-                    "fd_code" => $result->data->fd_code,
-                    "account_status" => $result->data->account_status,
-                    "username" => $result->data->username,
-                ]);
+            $user =  User::query()->updateOrCreate(['username' => $result->data->username, 'email' => $result->data->email], [
+                "email" => $result->data->email,
+                "password" => $result->data->password,
+                "fname" => Crypt::encryptString($result->data->fname),
+                "lname" => Crypt::encryptString($result->data->lname),
+                "fd_code" => $result->data->fd_code,
+                "account_status" => $result->data->account_status,
+                "username" => $result->data->username,
+            ]);
 
             $check = VerificationCode::query()->where('email', $result->data->email)->where('user_id', $user->id)->orderBy('id', 'desc')->first();
             $code = rand(100000, 999999);
             if ($check) {
 
                 if (!!$check->verified_at && $check->status == 1) {
-                    $checkTime =Carbon::parse($check->verified_at)->diffInMinutes( Carbon::now());
+                    $checkTime = Carbon::parse($check->verified_at)->diffInMinutes(Carbon::now());
 
                     if ($checkTime > 30) {
 
                         $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
-                        return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
+
+                        Mail::to($result->data->email)->send(new Otp($code));
+                        return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
                     } else {
 
                         $token = $user->createToken('Qad')->plainTextToken;
 
-                        return response()->json(["token" => $token,'role'=>'Qad'],201);
-
+                        return response()->json(["token" => $token, 'role' => 'Qad'], 201);
                     }
-                }
-                else {
+                } else {
 
                     $diffSeconds =  Carbon::parse($check->updated_at)->diffInSeconds(Carbon::now());
 
@@ -74,28 +75,26 @@ class AuthController extends Controller
 
                         $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
                     }
-                    return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
+                    Mail::to($result->data->email)->send(new Otp($code));
+                    return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
                 }
             } else {
 
 
                 $check = VerificationCode::query()
                     ->create([
-                    'email' => $result->data->email,
-                    'user_id' => $user->id,
-                    'code' => $code,
+                        'email' => $result->data->email,
+                        'user_id' => $user->id,
+                        'code' => $code,
                         'created_at' => Carbon::now(),
                         'updated_at' => Carbon::now(),
-                ]);
-                return response()->json(["message" => "Login Successful","token" => Crypt::encryptString($check->id)],200);
-
+                    ]);
+                Mail::to($result->data->email)->send(new Otp($code));
+                return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
             }
-
         } else {
             return response()->json(["errors" => ['email' => [$result->remarks]]], 422);
         }
-
-
     }
 
 
@@ -109,36 +108,33 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-       $otp =  VerificationCode::query()
-            ->select('id','user_id','code')
+        $otp =  VerificationCode::query()
+            ->select('id', 'user_id', 'code')
             ->where('id', Crypt::decryptString($request->verification_id))
             ->first();
-        if($otp->code == $request->otp)
-        {
+        if ($otp->code == $request->otp) {
 
-            if($request->input('role') === 'Qad')
-            {
+            if ($request->input('role') === 'Qad') {
 
                 $user = User::query()->where('id', $otp->user_id)->first();
                 $token = $user->createToken('Qad')->plainTextToken;
                 $otp->update([
                     'code' => null,
-                    'verified_at'=>Carbon::now(),
-                    'status'=>1
+                    'verified_at' => Carbon::now(),
+                    'status' => 1
                 ]);
-            return response()->json(["token" => $token,"role"=>'Qad'],200);
+                return response()->json(["token" => $token, "role" => 'Qad'], 200);
             }
-             if($request->input('role') === 'School')
-            {
+            if ($request->input('role') === 'School') {
                 $school = SchoolAccount::query()->where('school_number', $otp->user_id)->first();
 
-            $token = $school->createToken('School')->plainTextToken;
-            $otp->update([
-                'code' => null,
-                'verified_at'=>Carbon::now(),
-                'status'=>1
-            ]);
-            return response()->json(["token" => $token,"role"=>'School'],200);
+                $token = $school->createToken('School')->plainTextToken;
+                $otp->update([
+                    'code' => null,
+                    'verified_at' => Carbon::now(),
+                    'status' => 1
+                ]);
+                return response()->json(["token" => $token, "role" => 'School'], 200);
             }
         }
         return response()->json(['errors' => ['otp' => ['Invalid OTP']]], 401);
@@ -147,10 +143,12 @@ class AuthController extends Controller
     public function resendOtp(Request $request): \Illuminate\Http\JsonResponse
     {
         $code = rand(100000, 999999);
-       VerificationCode::query()
-                ->where('id', Crypt::decryptString($request->verification_id))
-                ->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
-        return response()->json(["token" => Crypt::encryptString($request->verification_id)],200);
+        $user = VerificationCode::query()
+            ->where('id', Crypt::decryptString($request->verification_id))
+            ->first();
+        $user->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
+        Mail::to($user->email)->send(new Otp($code));
+        return response()->json(["token" => Crypt::encryptString($request->verification_id)], 200);
     }
     public function getOtp($verification_id): \Illuminate\Http\JsonResponse
     {
@@ -158,16 +156,16 @@ class AuthController extends Controller
             $payload = Crypt::decryptString($verification_id);
             $verification = VerificationCode::query()->where('id',  $payload)->value('updated_at');
 
-            return response()->json($verification,201);
+            return response()->json($verification, 201);
         } catch (DecryptException $e) {
-           return response()->json(["errors" => ['message' => $e->getMessage()]], 400);
+            return response()->json(["errors" => ['message' => $e->getMessage()]], 400);
         }
     }
 
     public function qadInfo(Request $request): \Illuminate\Http\JsonResponse
     {
 
-            return response()->json($request->user());
+        return response()->json($request->user());
     }
 
     public function logout(Request $request): \Illuminate\Http\JsonResponse

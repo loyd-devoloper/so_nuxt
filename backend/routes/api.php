@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\QadAnnouncementController;
 use App\Http\Controllers\API\QadCurriculumController;
 use App\Http\Controllers\API\QadSchoolAccountController;
 use App\Http\Controllers\API\QadSdoAccountController;
+use App\Http\Controllers\API\QadTemplateController;
 use App\Http\Controllers\API\QadTransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,6 +60,23 @@ Route::middleware(['auth:sanctum', 'qad'])->prefix('qad')->group(function () {
     Route::controller(QadTransactionController::class)->prefix('transaction')->group(function () {
         Route::get('/', 'index');
 
+    });
+
+     ################################ Template ##########################################################
+    Route::controller(QadTemplateController::class)->prefix('template')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/destroy/{template_id}', 'destroy');
+        Route::post('/store', 'store');
+        Route::get('/download/{file_id}', 'downloadFile');
+    });
+
+       ################################ Announcement ##########################################################
+    Route::controller(QadAnnouncementController::class)->prefix('announcement')->group(function () {
+        Route::get('/', 'index');
+        Route::get('/edit/{template_id}', 'show');
+         Route::post('/update/{template_id}', 'update');
+        Route::post('/store', 'store');
+        Route::get('/viewFile/{announcement_id}', 'viewFile');
     });
 });
 Route::middleware(['auth:sanctum', 'qad'])->prefix('school')->group(function () {
