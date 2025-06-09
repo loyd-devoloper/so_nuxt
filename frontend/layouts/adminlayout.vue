@@ -160,7 +160,19 @@ const sidebarItem = computed(() => [
     to:{name: 'Qad-Transaction'}
 
   },
+  {
+    label: 'Announcement',
+    icon: 'streamline:quality-education',
+    active: route.name == 'Qad-Announcement' ,
+    to:{name: 'Qad-Announcement'}
 
+  },  {
+    label: 'Template',
+    icon: 'streamline:quality-education',
+    active: route.name == 'Qad-Template' ,
+    to:{name: 'Qad-Template'}
+
+  },
 ] as NavigationMenuItem[])
 
 </script>

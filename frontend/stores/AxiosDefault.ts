@@ -2,7 +2,7 @@ import axios from "axios"
 
 export const useAxiosDefaultStore = defineStore('axiosDefault', () => {
    const config = useRuntimeConfig()
-    const timeout = ref<number>( 1000 * 20);
+    const timeout = ref<number>( 1000 * 100);
 
     const authAxiosInstances = () => {
         const AxiosAuth = axios.create({

@@ -22,7 +22,9 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     '@pinia/nuxt',
     "@hebilicious/vue-query-nuxt",
+
   ],
+
   css: ['~/assets/css/main.css'],
   ui: {
     fonts: true,
