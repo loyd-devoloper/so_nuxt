@@ -1,7 +1,12 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
 @plugin "@tailwindcss/typography";
-
+@theme {
+    --font-sans: 'Public Sans',sans-serif;
+}
+.class{
+    font-family: "Roboto Light", sans-serif;
+}
 .inactive___button{
     @apply text-gray-400;
 }

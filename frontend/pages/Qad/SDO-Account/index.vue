@@ -4,25 +4,25 @@
     <UCard >
       <template #header>
         <div class="flex justify-between items-center gap-2">
-          <QadNewSdo/>
+         
           <UInput v-model="search" type="search" icon="i-lucide-search" placeholder="Search..." size="md" variant="outline"/>
-
+ <QadNewSdo/>
         </div>
       </template>
 
      <div class="overflow-x-auto">
-       <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
+       <table class="w-full  text-xs text-left rtl:text-right text-gray-500">
          <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
          <tr>
            <th class="px-6 py-3 " scope="col">
 
              <div class="flex items-center gap-2">
-               SDO Name <UIcon @click="sortColumn('sdo_name')" name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black"/>
+               SDO Name <UIcon name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black" @click="sortColumn('sdo_name')"/>
              </div>
            </th>
            <th class="px-6 py-3" scope="col">
              <div class="flex items-center gap-2">
-               SDO Code  <UIcon @click="sortColumn('sdo_code')" name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black"/>
+               SDO Code  <UIcon name="lsicon:sort-filled" size="1rem" class="cursor-pointer hover:text-black" @click="sortColumn('sdo_code')"/>
              </div>
            </th>
            <th class="px-6 py-3" scope="col">
@@ -57,7 +57,8 @@
              </div>
            </td>
          </tr>
-         <tr v-show="!isLoading"  v-for="sdoAccount in data?.data" :key="sdoAccount.id"
+         <tr
+v-for="sdoAccount in data?.data"  v-show="!isLoading" :key="sdoAccount.id"
              class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
            <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
              {{ sdoAccount?.sdo_name }}
@@ -75,12 +76,8 @@
              {{ sdoAccount?.type }}
            </td>
            <td class="px-6 py-4">
-             <div class="flex items-center">
-               <div :class="sdoAccount?.status === 'active' ? ' bg-green-500' : ' bg-red-500'"
-                    class="h-2.5 w-2.5 rounded-full me-2 "/>
-               <span class="capitalize">{{ sdoAccount?.status }}</span>
-             </div>
-
+             
+              <UBadge :color="sdoAccount?.status === 'active' ? 'success' : 'error'" variant="subtle" class="capitalize font-bold">{{ sdoAccount?.status }}</UBadge>
            </td>
            <td class="px-6 py-4">
              <QadEditSdo :sdo_account_id="sdoAccount.id"/>
@@ -91,7 +88,8 @@
        </table>
      </div>
 
-      <UPagination v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
+      <UPagination
+v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
                    class="pt-10  w-fit mx-auto" show-edges/>
 
     </UCard>

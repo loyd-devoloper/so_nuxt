@@ -28,9 +28,9 @@
             <UFormField :error="error?.applied_track && error?.applied_track[0]" label="Track" required :help="specialization.length === 0 ?' No available specializations found.' : ''">
               <USelectMenu
 
+                  v-model="track"
                   :filter-fields="['track', 'strand']"
                   :items="authStore.authUser.program_offered"
-                  v-model="track"
                   :multiple="false"
                   :required="true" class="w-full" size="md">
                 <template #leading="{ modelValue }">
@@ -61,23 +61,24 @@
             <UFormField :error="error?.attestation_file && error?.attestation_file[0]" label="Attestation File" required>
               <UInput
 accept="application/pdf,application/vnd.ms-excel"
-  @change="(e: Event) => (applicationData.attestation_file = (e.target as HTMLInputElement).files?.[0] || null)"
-                      class="w-full"
-                      size="lg" type="file" variant="outline"/>
+  class="w-full"
+                      size="lg"
+                      type="file" variant="outline" @change="(e: Event) => (applicationData.attestation_file = (e.target as HTMLInputElement).files?.[0] || null)"/>
             </UFormField>
             <UFormField :error="error?.form_9_file && error?.form_9_file[0]" label="Form 9" required>
-              <UInput  accept="application/pdf,application/vnd.ms-excel"
+              <UInput
+accept="application/pdf,application/vnd.ms-excel"
                       class="w-full"
-                      @change="(e: Event) => (applicationData.form_9_file = (e.target as HTMLInputElement).files?.[0] || null)"
-                      size="lg" type="file" variant="outline"/>
+                      size="lg"
+                      type="file" variant="outline" @change="(e: Event) => (applicationData.form_9_file = (e.target as HTMLInputElement).files?.[0] || null)"/>
             </UFormField>
             <UFormField :error="error?.students_file && error?.students_file[0]" hint="Excel File" label="Students File" required>
               <UInput
                       accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                       class="w-full"
                       size="lg"
-                      @change="(e: Event) => (applicationData.students_file = (e.target as HTMLInputElement).files?.[0] || null)"
-                      type="file" variant="outline"/>
+                      type="file"
+                      variant="outline" @change="(e: Event) => (applicationData.students_file = (e.target as HTMLInputElement).files?.[0] || null)"/>
             </UFormField>
             <UFormField :error="error?.graduation_date && error?.graduation_date[0]" label="Graduation Date" required>
               <UInput v-model="applicationData.graduation_date" class="w-full" size="lg" type="date" variant="outline"/>
@@ -93,7 +94,8 @@ accept="application/pdf,application/vnd.ms-excel"
 
         </form>
       </template>
-      <UButton color="secondary" icon="basil:add-outline" label="New Application" size="md" type="button"
+      <UButton
+color="secondary" icon="basil:add-outline" label="New Application" size="md" type="button"
                variant="solid"/>
     </UModal>
 
@@ -110,7 +112,9 @@ const open = ref<boolean>(false)
 const toast = useToast()
 const authStore = useAuthStore()
 const queryClient = useQueryClient();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const school_year = ref<{[key: string]: any;} | null>(null);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const track = ref<{[key: string]: any;} | null>(null);
 const specialization = ref<string[] | number[]>([]);
 const applicationData = reactive<NewApplicationType>({
@@ -142,6 +146,7 @@ const {mutate: storeApplicationFunc, error, isPending} = useMutation({
       icon: 'ooui:success'
     })
   },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
   onError: (error: any) => {
 
   },
@@ -152,7 +157,7 @@ watch(() => track.value, (newData) => {
   applicationData.applied_strand = newData?.strand;
   applicationData.applied_track = newData?.track;
    applicationData.applied_specialization = [];
-  specialization.value = newData?.specialization;
+  specialization.value = newData?.specialization ?? [];
   
 
 })

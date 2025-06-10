@@ -31,35 +31,45 @@
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
                   <UFormField :error="error?.admin_last_name && error?.admin_last_name[0]" label="Last Name" required>
-                    <UInput v-model="firstTimeLoginCredential.admin_last_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_last_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
-                  <UFormField :error="error?.admin_first_name && error?.admin_first_name[0]" label="First Name"
+                  <UFormField
+:error="error?.admin_first_name && error?.admin_first_name[0]" label="First Name"
                               required>
-                    <UInput v-model="firstTimeLoginCredential.admin_first_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_first_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
-                  <UFormField :error="error?.admin_middle_name && error?.admin_middle_name[0]" hint="Optional"
+                  <UFormField
+:error="error?.admin_middle_name && error?.admin_middle_name[0]" hint="Optional"
                               label="Middle Name">
-                    <UInput v-model="firstTimeLoginCredential.admin_middle_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_middle_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                   <UFormField :error="error?.admin_suffix && error?.admin_suffix[0]" hint="Optional" label="Suffix ">
-                    <UInput v-model="firstTimeLoginCredential.admin_suffix" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_suffix" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
-                  <UFormField :error="error?.admin_email_address  && error?.admin_email_address [0]" required
+                  <UFormField
+:error="error?.admin_email_address  && error?.admin_email_address [0]" required
                               label="Email Address">
-                    <UInput v-model="firstTimeLoginCredential.admin_email_address" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_email_address" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
-                  <UFormField :error="error?.admin_contact_number && error?.admin_contact_number[0]" required
+                  <UFormField
+:error="error?.admin_contact_number && error?.admin_contact_number[0]" required
                               label="Contact Number ">
-                    <UInput v-model="firstTimeLoginCredential.admin_contact_number" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.admin_contact_number" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
@@ -99,49 +109,63 @@
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
                   <UFormField :error="error?.school_number && error?.school_number[0]" label="School Number" required>
-                    <UInput v-model="firstTimeLoginCredential.school_number" class="w-full" disabled size="md"
+                    <UInput
+v-model="firstTimeLoginCredential.school_number" class="w-full" disabled size="md"
                             type="number" variant="outline"/>
                   </UFormField>
                   <UFormField :error="error?.school_name && error?.school_name[0]" label="School Name" required>
-                    <UInput v-model="firstTimeLoginCredential.school_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.school_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
-                  <UFormField :error="error?.school_address && error?.school_address[0]" label="School Address "
+                  <UFormField
+:error="error?.school_address && error?.school_address[0]" label="School Address "
                               required>
-                    <UInput v-model="firstTimeLoginCredential.school_address" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.school_address" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
-                  <UFormField :error="error?.school_head_name && error?.school_head_name[0]" label="School Head Name"
+                  <UFormField
+:error="error?.school_head_name && error?.school_head_name[0]" label="School Head Name"
                               required>
-                    <UInput v-model="firstTimeLoginCredential.school_head_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.school_head_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
-                  <UFormField :error="error?.owner_name  && error?.owner_name [0]" hint="Optional"
+                  <UFormField
+:error="error?.owner_name  && error?.owner_name [0]" hint="Optional"
                               label="Owner Name">
-                    <UInput v-model="firstTimeLoginCredential.owner_name" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.owner_name" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
-                  <UFormField :error="error?.school_email_address && error?.school_email_address[0]"
+                  <UFormField
+:error="error?.school_email_address && error?.school_email_address[0]"
                               label="School Email Address"
                               required>
-                    <UInput v-model="firstTimeLoginCredential.school_email_address" class="w-full" size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.school_email_address" class="w-full" size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
                 <div class="grid grid-cols-2 gap-5 ">
-                  <UFormField :error="error?.school_contact_number  && error?.school_contact_number [0]"
+                  <UFormField
+:error="error?.school_contact_number  && error?.school_contact_number [0]"
                               label="School Contact Number"
                               required>
-                    <UInput v-model="firstTimeLoginCredential.school_contact_number" class="w-full" size="md"
+                    <UInput
+v-model="firstTimeLoginCredential.school_contact_number" class="w-full" size="md"
                             type="text" variant="outline"/>
                   </UFormField>
-                  <UFormField label="SDO Name"
+                  <UFormField
+label="SDO Name"
                               required>
-                    <UInput v-model="firstTimeLoginCredential.sdo_id" class="w-full" disabled size="md" type="text"
+                    <UInput
+v-model="firstTimeLoginCredential.sdo_id" class="w-full" disabled size="md" type="text"
                             variant="outline"/>
                   </UFormField>
                 </div>
@@ -149,14 +173,16 @@
                   <UFormField
                       :error="error?.sec_permit && error?.sec_permit[0]" label="SEC Registration Permit "
                       required>
-                    <UInput class="w-full" size="md" type="file" variant="outline"
+                    <UInput
+class="w-full" size="md" type="file" variant="outline"
 accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.sec_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.sec_permit?.name }}</small>
                   </UFormField>
                   <UFormField
                       hint="Optional" label="SEC Registration Permit Expiration">
-                    <UInput v-model="firstTimeLoginCredential.sec_expiration_date" class="w-full" size="md" type="date"
+                    <UInput
+v-model="firstTimeLoginCredential.sec_expiration_date" class="w-full" size="md" type="date"
                             variant="outline"/>
 
                   </UFormField>
@@ -166,14 +192,16 @@ accept="application/pdf,application/vnd.ms-excel"
                   <UFormField
                       :error="error?.shs_provisional_permit && error?.shs_provisional_permit[0]" label="SHS Provisional Permit"
                       required>
-                    <UInput class="w-full" size="md" type="file" variant="outline"
+                    <UInput
+class="w-full" size="md" type="file" variant="outline"
                     accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.shs_provisional_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.shs_provisional_permit?.name }}</small>
                   </UFormField>
                   <UFormField
                       hint="Optional" label="SEC Registration Permit Expiration">
-                    <UInput v-model="firstTimeLoginCredential.shs_provisional_expiration_date" class="w-full" size="md"
+                    <UInput
+v-model="firstTimeLoginCredential.shs_provisional_expiration_date" class="w-full" size="md"
                             type="date" variant="outline"/>
                   </UFormField>
 
@@ -185,14 +213,16 @@ accept="application/pdf,application/vnd.ms-excel"
 
                      
                       required>
-                    <UInput class="w-full" size="md" type="file" variant="outline"
+                    <UInput
+class="w-full" size="md" type="file" variant="outline"
                      accept="application/pdf,application/vnd.ms-excel"
                             @change="(e: Event) => (firstTimeLoginCredential.mayors_permit = (e.target as HTMLInputElement).files?.[0] || null)"/>
                     <small>{{ firstTimeLoginCredential?.mayors_permit?.name }}</small>
                   </UFormField>
                   <UFormField
                       hint="Optional" label="Mayor's Permit Expiration">
-                    <UInput v-model="firstTimeLoginCredential.mayors_permit_expiration_date" class="w-full" size="md"
+                    <UInput
+v-model="firstTimeLoginCredential.mayors_permit_expiration_date" class="w-full" size="md"
                             type="date" variant="outline"/>
                   </UFormField>
 
@@ -320,7 +350,8 @@ accept="application/pdf,application/vnd.ms-excel"
           >
             Next
           </UButton>
-          <UButton v-if="!stepper?.hasNext && authStore.authUser?.is_first_time_login === 1" :disabled="isPending"
+          <UButton
+v-if="!stepper?.hasNext && authStore.authUser?.is_first_time_login === 1" :disabled="isPending"
                    :loading="isPending" color="secondary" type="submit">
             Submit
           </UButton>
@@ -384,17 +415,20 @@ const firstTimeLoginCredential = reactive<FirstTimeLoginType>({
 const show = ref(false)
 const open = ref<boolean>(authStore.authUser?.status !== 'approved')
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const schoolPrograms = reactive<{ track?: string, track_key?: string, strand?: any, specialization?: any }>({
   track: '',
   track_key: '',
   strand: '',
   specialization: []
 })
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const strandArr = ref<{[key: string]: any;}[]>([]);
 const specializationArr = ref([]);
 watch(() => schoolPrograms.track, (newTrack) => {
   schoolPrograms.strand = '';
   schoolPrograms.specialization = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const newData = data.value?.programs.find((value:{[key: string]: any;}) => {
     return value.id === newTrack
 
@@ -415,6 +449,7 @@ watch(() => schoolPrograms.strand, (newStrand) => {
   }
 })
 const submitProgram = () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const checkIfExist = firstTimeLoginCredential.program_offered.find((track: any) => {
     return track.track === schoolPrograms.track_key && track.strand === schoolPrograms.strand;
   });
@@ -448,9 +483,11 @@ const {mutate: firstTimeLoginFunc, error, isPending} = useMutation({
     toast.add({
       title: data,
       color: 'success',
+        icon:'ooui:success'
     })
   },
-  onError: (err: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onError: (_err: any) => {
 
   },
 });

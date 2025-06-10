@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {useAxiosDefaultStore} from "~/stores/AxiosDefault";
 
 import {PaginateAttr} from "#shared/enums/PaginateAttr";
@@ -16,6 +17,7 @@ export async function storeSchoolAccount(schoolCredentials: SchoolCredentialsTyp
     }
 
 }
+
 export async function storeSchoolBulkAccount(file: Ref){
     try
     {
@@ -36,6 +38,19 @@ export async function fetchSchoolAccount(page: Ref,search: string,sortColumn: Re
             .authAxiosInstances()
             .get(`/api/qad/school-account?q=${search}&limit=${PaginateAttr.LIMIT}&page=${page.value}&sort=${sortColumn.value}&d=${direction.value}`);
         return response.data;
+    }catch(error:any)
+    {
+        throw error.response.data.errors;
+    }
+
+}
+export async function changePassword(passwordData: {password:string,password_confirmation:string},school_account_id:string | number){
+    try
+    {
+        const response =   await useAxiosDefaultStore()
+            .authAxiosInstances()
+            .post(`/api/qad/school-account/change-password/${school_account_id}`,passwordData);
+        return response.data.success;
     }catch(error:any)
     {
         throw error.response.data.errors;
@@ -70,6 +85,7 @@ export async function updateSchoolAccount(sdo_account_id: string | number,school
     {
         const response =   await useAxiosDefaultStore().authAxiosInstances().post(`/api/qad/school-account/update/${sdo_account_id}`,schoolCredentials);
         return response.data.success;
+     
     }catch(error:any)
     {
         throw error.response.data;
@@ -86,6 +102,7 @@ export async function viewAttachment(attachment_id?: string | number){
         const blob = new Blob([response.data], { type: 'application/pdf' });
         return URL.createObjectURL(blob);
 
+     
     }catch(error:any)
     {
         throw error.response.data.errors;

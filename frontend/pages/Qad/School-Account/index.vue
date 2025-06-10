@@ -4,32 +4,36 @@
     <UCard>
       <template #header>
         <div class="flex justify-between items-center gap-2">
-          <div class="space-x-2">
+
+          <UInput
+v-model="search" icon="i-lucide-search" placeholder="Search..." size="md" type="search"
+                  variant="outline"/>
+          <div class="space-x-1">
             <QadNewSchool/>
             <QadNewBulkSchool/>
-          </div>
-          <UInput v-model="search" icon="i-lucide-search" placeholder="Search..." size="md" type="search"
-                  variant="outline"/>
 
+          </div>
         </div>
       </template>
 
       <div class="overflow-x-auto">
-        <table class="w-full  text-sm text-left rtl:text-right text-gray-500">
+        <table class="w-full  text-xs text-left rtl:text-right text-gray-500">
           <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
           <tr>
             <th class="px-6 py-3 " scope="col">
 
               <div class="flex items-center gap-2">
                 School Name
-                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('school_name')"/>
               </div>
             </th>
             <th class="px-6 py-3" scope="col">
               <div class="flex items-center gap-2">
                 School Number
-                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('school_number')"/>
               </div>
             </th>
@@ -58,14 +62,14 @@
           </thead>
           <tbody>
           <tr v-show="isLoading">
-            <td class=" w-full" colspan="8">
+            <td class=" w-full" colspan="9">
               <div class="flex justify-center py-10">
                 <UIcon class="animate-spin text-black/80" name="ant-design:loading-3-quarters-outlined" size="3rem"/>
               </div>
             </td>
           </tr>
           <tr v-show="!isLoading && data?.data.length === 0">
-            <td class=" w-full" colspan="8">
+            <td class=" w-full" colspan="9">
               <div class="flex justify-center py-10">
                 <p class="text-red-500 font-bold">No Data Found</p>
               </div>
@@ -97,15 +101,14 @@
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center">
-                <div
-                    :class="schoolAccount?.status === 'approved' ? ' bg-green-500' : schoolAccount.status === 'pending' ?  'bg-orange-400' : ' bg-red-500'"
-                    class="h-2.5 w-2.5 rounded-full me-2 "/>
-                <span class="capitalize">{{ schoolAccount?.status }}</span>
+          
+                <UBadge variant="subtle" :color="schoolAccount?.status === 'approved' ? 'success' : schoolAccount.status === 'pending'  ?  'warning' : schoolAccount.status === 'validating'  ?  'secondary' : 'error'" class="capitalize font-bold">{{ schoolAccount?.status }}</UBadge>
               </div>
 
             </td>
             <td class="px-6 py-4">
-              <QadValidateSchool v-if="schoolAccount.status === 'approved' || schoolAccount.status === 'validating'" :school_id="schoolAccount.id" :label="schoolAccount.status === 'approved' ? 'Update' : 'Validate'"/>
+              <QadValidateSchool  :school_id="schoolAccount.id" :label="schoolAccount.status === 'approved' ? 'Update' : 'Validate'" class="font-bold"/>
+              <QadSchoolAccountQadChangePasswordSchool :school-id="schoolAccount.id"/>
             </td>
           </tr>
 

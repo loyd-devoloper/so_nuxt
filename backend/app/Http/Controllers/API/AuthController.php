@@ -34,12 +34,13 @@ class AuthController extends Controller
         $apiData =  Http::withoutVerifying()->get('https://teahub.depedcalabarzon.ph/api/login-request/$2y$10$cLeGKQPtcL1mXbaAGp6NDeKml4EEN0468YrdSSLnjlMfZNxLgC/' . $request->email . '/' . $request->password);
         $result = json_decode($apiData);
 
+
         if ($result->status == "200" && strtolower($result->data->account_status) == "enabled") {
             $user =  User::query()->updateOrCreate(['username' => $result->data->username, 'email' => $result->data->email], [
                 "email" => $result->data->email,
                 "password" => $result->data->password,
-                "fname" => Crypt::encryptString($result->data->fname),
-                "lname" => Crypt::encryptString($result->data->lname),
+                "fname" =>$result->data->fname,
+                "lname" => $result->data->lname,
                 "fd_code" => $result->data->fd_code,
                 "account_status" => $result->data->account_status,
                 "username" => $result->data->username,

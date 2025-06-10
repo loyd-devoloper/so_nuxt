@@ -126,8 +126,7 @@ class AuthController extends Controller
             "school_name" => 'required',
             "school_address" => 'required',
             "password" => 'required',
-            "school_head_name" => 'required',
-            "owner_name" => 'nullable|string',
+
             'sec_permit' => 'required|file|mimes:pdf',
             'shs_provisional_permit' => 'required|file|mimes:pdf',
             'mayors_permit' => 'required|file|mimes:pdf',

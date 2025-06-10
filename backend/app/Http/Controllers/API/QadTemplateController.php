@@ -21,7 +21,7 @@ class QadTemplateController extends Controller
         $limit = $request->limit ?? 10;
         $sortColumn = $request->sort ?? 'id';
         $sortDirection = $request->d ?? 'asc';
-        $templates = Template::query()->with('userInfo')
+        $templates = Template::query()->with(['userInfo'])
             ->where(function ($query) use ($search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('type', 'like', "%{$search}%");

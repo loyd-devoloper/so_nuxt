@@ -1,7 +1,7 @@
 <template>
     <div>
 
-        <UCard class="shadow-none border border-black/10 drop-shadow-none">
+        <UCard class="shadow-md">
             <template #header class="pb-4">
                 <div class="flex justify-between items-center gap-2">
 
@@ -69,7 +69,7 @@
                             </td>
                         </tr>
                         <tr v-show="!isLoading && data?.data.length === 0">
-                            <td class=" w-full" colspan="8">
+                            <td class=" w-full" colspan="10">
                                 <div class="flex justify-center py-10">
                                     <p class="text-red-500 font-bold">No Data Found</p>
                                 </div>

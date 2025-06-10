@@ -4,9 +4,9 @@
     <UCard >
       <template #header>
         <div class="flex justify-between items-center gap-2">
-          <QadNewCurriculum/>
-          <UInput v-model="search" type="search" icon="i-lucide-search" placeholder="Search..." size="md" variant="outline"/>
 
+          <UInput v-model="search" type="search" icon="i-lucide-search" placeholder="Search..." size="md" variant="outline"/>
+          <QadCurriculumManagementQadNewCurriculum/>
         </div>
       </template>
 
@@ -110,11 +110,7 @@ v-for="curriculum in data?.data"  v-show="!isLoading" :key="curriculum.id"
 <script lang="ts" setup>
 
 import debounce from 'lodash.debounce'
-import QadNewCurriculum from "~/components/Qad/CurriculumManagement/QadNewCurriculum.vue";
 import {fetchCurricula} from "#shared/API/Qad/CurriculumManagementApi";
-import QadEditCurriculum from "~/components/Qad/CurriculumManagement/QadEditCurriculum.vue";
-
-
 const route = useRoute();
 const queryClient = useQueryClient();
 const page = ref<number>(parseInt(route?.query?.page as string) || 1);

@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {useAxiosDefaultStore} from "~/stores/AxiosDefault";
-import type {FirstTimeLoginType} from "#shared/types/School/firstTimeLoginType";
 import type {NewApplicationType, StudentType} from "#shared/types/School/SchoolApplicationType";
 import { PaginateAttr } from "~/shared/enums/PaginateAttr";
 
@@ -70,7 +70,7 @@ export async function storeBulkSoStudents(file: File | null,application_id: any)
         const response =   await useAxiosDefaultStore()
             .authAxiosInstances()
             .post(`/api/school/transaction/students/create/bulk/${application_id}`,formData);
-        return response.data.success;
+        return response.data;
     }catch(error:any)
     {
         throw error.response.data.errors;

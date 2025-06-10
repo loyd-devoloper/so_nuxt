@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum', 'qad'])->prefix('qad')->group(function () {
         Route::post('/update/{school_account_id}', 'update');
         Route::get('/sdo-list', 'sdoList');
         Route::post('/store-bulk', 'storeBulk');
+        Route::post('/change-password/{school_account_id}', 'schoolChangePassword');
         Route::get('/attachment/{attachment_id}', 'viewAttachment');
     });
     ################################ CURRICULUM ##########################################################

@@ -24,7 +24,7 @@ return new class extends Migration
             $table->date('date_established')->nullable();
             $table->text('admin_first_name')->nullable();
             $table->text('admin_last_name')->nullable();
-            $table->string('admin_email_address')->unique()->nullable();
+            $table->text('admin_email_address')->unique()->nullable();
             $table->text('admin_contact_number')->nullable();
             $table->text('admin_suffix')->nullable();
             $table->text('admin_middle_name')->nullable();

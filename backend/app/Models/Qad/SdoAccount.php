@@ -28,12 +28,14 @@ class SdoAccount extends Authenticatable
     {
         return Attribute::make(
             get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
+            set: fn (?string $value) => $value ? Crypt::encryptString($value) : null,
         );
     }
     protected function sdsName(): Attribute
     {
         return Attribute::make(
             get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
+            set: fn (?string $value) => $value ? Crypt::encryptString($value) : null,
         );
     }
 }

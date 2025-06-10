@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\School;
 
 use App\Models\School\SoApplication;
 use App\Traits\DocumentsTrait;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Qad\Curriculum;
 use Illuminate\Support\Carbon;
@@ -229,20 +230,24 @@ class TransactionController extends Controller
             $rows = $spreadsheet->getSheet(0)->toArray();
             $application = SoApplication::query()->where('id',$application_id)->first();
 
+            $recordInserted = 0;
             $skippedEntries = [];
             foreach ($rows as $index => $row) {
                 if ($index < 2) continue; // Skip header rows
                 if (empty($row[1])) break;
                 $lrn = trim($row[5]);
-                if (empty($lrn)) {
-                    $skippedEntries[] = "Row " . ($index + 1) . ": LRN is empty.";
-                    continue;
-                }
-                if (SoStudent::query()->where('so_application_id',$application_id)->where('lrn', $lrn)->exists()) {
-                    $skippedEntries[] = "Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'";
-                    continue;
-                }
+
                 try {
+                    if (empty($lrn)) {
+
+                        throw new Exception( "Row " . ($index + 1) . ": LRN is empty.");
+                        continue;
+                    }
+                    if (SoStudent::query()->where('so_application_id',$application_id)->where('lrn', $lrn)->exists()) {
+
+                        throw new Exception( "Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'");
+                        continue;
+                    }
                     SoStudent::query()->create([
                         "school_id"         => $user->school_number,
                         "so_application_id" => $application_id,
@@ -253,18 +258,20 @@ class TransactionController extends Controller
                         "suffix"            => trim($row[4] ?? ''),
                         "lrn"               => $lrn,
                     ]);
+                    $recordInserted++;
                 } catch (\Exception $e) {
-                    $skippedEntries[] = "Row " . ($index + 1) . ": " . $e->getMessage();
+                    $skippedEntries[] =  $e->getMessage();
+                    continue; // This will continue to the next row
                 }
             }
             // $this->saveDocument($school->id, $application_id, 'Student File', $file_path);
 
             return response()->json([
-                "message" => "Students successfully uploaded.",
+                "success" => "$recordInserted record(s) successfully registered",
                 "skipped" => $skippedEntries
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(["error" => $e->getMessage()], 500);
+            return response()->json(["error" => $e->getMessage()], 400);
         }
     }
 }

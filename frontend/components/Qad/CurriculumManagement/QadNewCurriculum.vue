@@ -2,7 +2,7 @@
 
 
   <UModal v-model:open="open" :close="true" title="New Curriculum">
-    <UButton color="secondary" icon="basil:add-outline" label="Create Curriculum" type="button" variant="solid"/>
+    <UButton  icon="basil:add-outline" label="Create Curriculum" type="button" variant="solid"/>
     <template #body>
       <form class=" space-y-3" @submit.prevent="storeSchoolAccountFunc()">
 
@@ -14,7 +14,7 @@
           </UFormField>
           <UFormField :error="error?.school_year_end && error?.school_year_end[0]" label="End Year" required>
             <UInput
-                v-model="curriculumCredential.school_year_end" class="w-full" size="lg" type="number"
+                v-model="curriculumCredential.school_year_end" class="w-full" disabled size="lg" type="number"
                 variant="outline"/>
           </UFormField>
         </div>
@@ -68,8 +68,6 @@
         </div>
       </form>
     </template>
-
-
   </UModal>
 
 
@@ -100,5 +98,12 @@ const {mutate: storeSchoolAccountFunc, error, isPending} = useMutation({
 
   },
 });
-
+watch(()=>curriculumCredential.school_year_start, (newVal) => {
+  if (newVal)
+  {
+    curriculumCredential.school_year_end = newVal + 1;
+  }else{
+    curriculumCredential.school_year_end = '';
+  }
+})
 </script>

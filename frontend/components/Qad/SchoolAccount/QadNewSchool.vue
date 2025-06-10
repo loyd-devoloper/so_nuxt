@@ -2,7 +2,7 @@
 
 
   <UModal v-model:open="open" :close="true" title="New School Account">
-    <UButton color="secondary" icon="basil:add-outline" label="Create School Account" type="button" variant="solid"/>
+    <UButton color="secondary" icon="basil:add-outline" label="Create" type="button" size="md" variant="solid"/>
     <template #body>
       <form class=" space-y-3" @submit.prevent="storeSchoolAccountFunc()">
         <h2 class="font-bold">School Details</h2>
@@ -19,12 +19,14 @@
         </UFormField>
         <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office" required>
 
-          <USelectMenu v-model="schoolCredentials.sdo_id" :items="data" label-key="sdo_name" value-key="id"
+          <USelectMenu
+v-model="schoolCredentials.sdo_id" :items="data" label-key="sdo_name" value-key="id"
                        :multiple="false" class="w-full" size="lg"/>
         </UFormField>
         <h2 class="font-bold">School Details</h2>
         <div class="grid grid-cols-2 gap-5 ">
-          <UFormField :error="error?.school_email_address && error?.school_email_address[0]" label="Email Address"
+          <UFormField
+:error="error?.school_email_address && error?.school_email_address[0]" label="Email Address"
                       required>
             <UInput v-model="schoolCredentials.school_email_address" class="w-full" size="lg" type="email" variant="outline"/>
           </UFormField>
@@ -87,7 +89,8 @@ const {mutate: storeSchoolAccountFunc, error, isPending} = useMutation({
       icon:'ooui:success'
     })
   },
-  onError: (err: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onError: (_err: any) => {
 
   },
 });

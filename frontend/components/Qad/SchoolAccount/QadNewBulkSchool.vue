@@ -2,11 +2,10 @@
 
 
   <UModal v-model:open="open" :close="true" title="New School Account">
-    <UButton color="secondary" icon="basil:add-outline" label="Create Bulk School Account" type="button" variant="solid"/>
+    <UButton color="success" icon="basil:add-outline" label="Bulk" type="button" variant="outline"/>
     <template #body>
       <form class=" space-y-3" @submit.prevent="storeSchoolBulkAccountFunc()">
 
-  {{error}}
           <UFormField
 :error="error?.excel_file && error?.excel_file[0]" label="Excel File"
                       required>
@@ -41,12 +40,22 @@ const {mutate: storeSchoolBulkAccountFunc, error, isPending} = useMutation({
   onSuccess:  (data) => {
     queryClient.invalidateQueries({queryKey: ["QAD_SCHOOL_ACCOUNT"]});
     open.value = false;
+
+    if (data.skipped && data.skipped.length > 0) {
+      toast.add({
+        title: 'Skipped Entries',
+        description: data.skipped.join('\n'),
+
+        color: 'error'
+      });
+    }
     toast.add({
-      title: data,
+      title: data.success,
       color: 'success',
       icon:'ooui:success'
     })
   },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
   onError: (err: any) => {
 
   },
