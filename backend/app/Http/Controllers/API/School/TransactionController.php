@@ -241,12 +241,12 @@ class TransactionController extends Controller
                     if (empty($lrn)) {
 
                         throw new Exception( "Row " . ($index + 1) . ": LRN is empty.");
-                        continue;
+
                     }
                     if (SoStudent::query()->where('so_application_id',$application_id)->where('lrn', $lrn)->exists()) {
 
                         throw new Exception( "Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'");
-                        continue;
+
                     }
                     SoStudent::query()->create([
                         "school_id"         => $user->school_number,
