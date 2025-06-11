@@ -1,7 +1,7 @@
 <template>
 
 
-  <UModal v-model:open="open" :close="true" title="New Curriculum" >
+  <UModal v-model:open="open" :close="true" title="Edit Curriculum" >
     <UButton color="success" icon="lucide:edit" label="EDIT" size="sm"  type="button" variant="outline"/>
     <template #body>
       <form class=" space-y-3" @submit.prevent="updateProgramFunc()">

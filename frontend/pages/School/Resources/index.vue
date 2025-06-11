@@ -1,22 +1,28 @@
 <template>
   <div>
-     <div class="">
-       <UTabs :items="items" class="mx-auto">
-          <template #memo>
-              <UCard class="w-full">
-      
-      dsadad
+    <UCard class="bg-white">
+      <UTabs :items="items" class="mx-auto " default-value="2" variant="link">
+          <template #attachment>
+          
+            <SchoolResourcesAttachement/>
+           
+   
+        </template>
+        <template #memo>
+         
+
+            <SchoolResourcesMemo/>
+         
+        </template>
+       <template #template>
+        
+
+            <SchoolResourcesTemplate/>
+        
+        </template>
+      </UTabs>
     </UCard>
-          </template>
-           <template #account>
-              <UCard class="w-full">
-      
-      dsadad
-    </UCard>
-          </template>
-       </UTabs>
-     </div>
-    
+
   </div>
 </template>
 <script setup lang="ts">
@@ -27,23 +33,24 @@ definePageMeta({
   layout: 'school',
 });
 const items = ref<TabsItem[]>([
+   {
+    label: 'Template',
+    icon: 'i-lucide-lock',
+    slot: 'template' as const,
+
+  },
   {
-    label: 'Account',
+    label: 'Attachment',
     icon: 'i-lucide-user',
-    content: 'This is the account content.',
-     slot: 'account' as const
+   
+    slot: 'attachment' as const
   },
   {
     label: 'Memo',
     icon: 'i-lucide-lock',
-    content: 'This is the password content.',
+
     slot: 'memo' as const
   },
-  {
-    label: 'Template',
-    icon: 'i-lucide-lock',
-    content: 'This is the password content.',
-    slot: 'template' as const
-  }
+ 
 ])
 </script>

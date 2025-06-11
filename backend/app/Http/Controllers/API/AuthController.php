@@ -98,7 +98,80 @@ class AuthController extends Controller
         }
     }
 
+    public function qadLoginHome(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            "email" => "required|email",
+            "password" => "required"
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::query()->where('email',$request->email)->first();
+        if (Hash::check($request->password,$user->password)) {
+            // $user =  User::query()->updateOrCreate(['username' => $result->data->username, 'email' => $result->data->email], [
+            //     "email" => $result->data->email,
+            //     "password" => $result->data->password,
+            //     "fname" =>$result->data->fname,
+            //     "lname" => $result->data->lname,
+            //     "fd_code" => $result->data->fd_code,
+            //     "account_status" => $result->data->account_status,
+            //     "username" => $result->data->username,
+            // ]);
+
+            $check = VerificationCode::query()->where('email', $request->email)->where('user_id', $user->id)->orderBy('id', 'desc')->first();
+            $code = rand(100000, 999999);
+            if ($check) {
+
+                if (!!$check->verified_at && $check->status == 1) {
+                    $checkTime = Carbon::parse($check->verified_at)->diffInMinutes(Carbon::now());
+
+                    if ($checkTime > 30) {
+
+                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
+
+                        Mail::to($request->email)->send(new Otp($code));
+                        return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
+                    } else {
+
+                        $token = $user->createToken('Qad')->plainTextToken;
+
+                        return response()->json(["token" => $token, 'role' => 'Qad'], 201);
+                    }
+                } else {
+
+                    $diffSeconds =  Carbon::parse($check->updated_at)->diffInSeconds(Carbon::now());
+
+
+                    $fixMinus = (10 * 60) - $diffSeconds;
+
+                    if ($fixMinus < 0) {
+
+                        $check->update(['status' => 0, 'verified_at' => null, 'code' => $code]);
+                    }
+                    Mail::to($request->email)->send(new Otp($code));
+                    return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
+                }
+            } else {
+
+
+                $check = VerificationCode::query()
+                    ->create([
+                        'email' => $request->email,
+                        'user_id' => $user->id,
+                        'code' => $code,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                Mail::to($request->email)->send(new Otp($code));
+                return response()->json(["message" => "Login Successful", "token" => Crypt::encryptString($check->id)], 200);
+            }
+        } else {
+            return response()->json(["errors" => ['email' => ['Wrong Credential']]], 422);
+        }
+    }
     public function verifyOtp(Request $request): \Illuminate\Http\JsonResponse|array
     {
 

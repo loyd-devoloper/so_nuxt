@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-        use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -34,18 +34,18 @@ class User extends Authenticatable
     ];
 
 
-     protected function fname():Attribute
+    protected function fname(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
-            set: fn (?string $value) => $value ? Crypt::encryptString($value) : null,
+            get: fn(?string $value) => $value ? Crypt::decryptString($value) : null,
+            set: fn(?string $value) => $value ? Crypt::encryptString($value) : null,
         );
     }
-  protected function lname():Attribute
+    protected function lname(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ? Crypt::decryptString($value) : null,
-            set: fn (?string $value) => $value ? Crypt::encryptString($value) : null,
+            get: fn(?string $value) => $value ? Crypt::decryptString($value) : null,
+            set: fn(?string $value) => $value ? Crypt::encryptString($value) : null,
         );
     }
     /**

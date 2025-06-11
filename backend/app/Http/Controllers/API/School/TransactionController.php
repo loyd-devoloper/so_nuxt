@@ -69,10 +69,11 @@ class TransactionController extends Controller
                         "created_at" => Carbon::now(),
                     ]);
 
-                $attestation_path = $this->storeFile($request->file('attestation_file'), $savingFolder);
+
                 $form_9_path = $this->storeFile($request->file('form_9_file'), $savingFolder);
-                $this->addDocument($user->school_number,  'Form 9', $form_9_path, $application->id,);
-                $this->addDocument($user->school_number, 'Attestation File', $attestation_path, $application->id);
+                $this->addDocument($user->school_number,  $request->file('form_9_file')->getClientOriginalName(), $form_9_path, $application->id,);
+                $attestation_path = $this->storeFile($request->file('attestation_file'), $savingFolder);
+                $this->addDocument($user->school_number, $request->file('attestation_file')->getClientOriginalName(), $attestation_path, $application->id);
                 // Insert Student to Table
                 if ($request->students_file) {
                     $spreadsheet = IOFactory::load($request->students_file);
@@ -98,7 +99,7 @@ class TransactionController extends Controller
                         ? $this->storeFile($request->file('students_file'), $savingFolder)
                         : null;
 
-                    $this->addDocument($user->school_number, 'Student File', $students_path, $application->id);
+                    $this->addDocument($user->school_number, $request->file('students_file')->getClientOriginalName(), $students_path, $application->id);
                 }
                 // $this->saveApplicationLogs(auth('sanctum')->user()->id, $application->id, 'Create', 'Create new SO Application', $application);
                 return response()->json(["message" => "Application Successfully Submitted"], 200);
@@ -212,14 +213,14 @@ class TransactionController extends Controller
         return response()->json(["success" => "Student Updated Successfully"], 200);
     }
 
-    public function storeStudentBulk(Request $request,$application_id)
+    public function storeStudentBulk(Request $request, $application_id)
     {
         $request->validate([
             'excel_file' => 'required|mimes:xls,xlsx,csv',
         ]);
         try {
             $user = $request->user();
-            $school = $user->schoolBelong;
+
 
             $folder = "school_docs/{$user->school_number}/transaction/" . now()->format('Y-m-d_H-i-s');
             $file_path = $this->storeFile($request->file('excel_file'), $folder);
@@ -228,7 +229,7 @@ class TransactionController extends Controller
             }
             $spreadsheet = IOFactory::load(storage_path('app/private/' . $file_path));
             $rows = $spreadsheet->getSheet(0)->toArray();
-            $application = SoApplication::query()->where('id',$application_id)->first();
+            $application = SoApplication::query()->where('id', $application_id)->first();
 
             $recordInserted = 0;
             $skippedEntries = [];
@@ -240,13 +241,11 @@ class TransactionController extends Controller
                 try {
                     if (empty($lrn)) {
 
-                        throw new Exception( "Row " . ($index + 1) . ": LRN is empty.");
-
+                        throw new Exception("Row " . ($index + 1) . ": LRN is empty.");
                     }
-                    if (SoStudent::query()->where('so_application_id',$application_id)->where('lrn', $lrn)->exists()) {
+                    if (SoStudent::query()->where('so_application_id', $application_id)->where('lrn', $lrn)->exists()) {
 
-                        throw new Exception( "Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'");
-
+                        throw new Exception("Row " . ($index + 1) . ": Duplicate student with LRN '$lrn'");
                     }
                     SoStudent::query()->create([
                         "school_id"         => $user->school_number,
@@ -266,6 +265,8 @@ class TransactionController extends Controller
             }
             // $this->saveDocument($school->id, $application_id, 'Student File', $file_path);
 
+
+            $this->addDocument($user->school_number, $request->file('excel_file')->getClientOriginalName(), $file_path, $application->id);
             return response()->json([
                 "success" => "$recordInserted record(s) successfully registered",
                 "skipped" => $skippedEntries

@@ -169,7 +169,7 @@ const items = (id: string): DropdownMenuItem[] => [
     {
         label: 'Students',
         to: {
-            name: 'School-Transaction-Students-application_id',
+            name: 'Qad-Transaction-application_id',
             params: { application_id: id } // Using the dynamic value here
         },
         icon: 'hugeicons:students'

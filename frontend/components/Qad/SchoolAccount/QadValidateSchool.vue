@@ -1,19 +1,16 @@
 <template>
-  <UModal
-v-model:open="open" :close="true" :dismissible="false" :ui="{
+  <UModal v-model:open="open" :close="true" :dismissible="false" :ui="{
 
     content: 'max-w-screen-2xl'
   }" title="Validate School Account">
-    <UButton
-color="success" icon="lucide:edit" :label="label ?? 'Validate'" size="sm" type="button"
+    <UButton color="success" icon="lucide:edit" :label="label ?? 'Validate'" size="sm" type="button"
       variant="outline" />
     <template #body>
       <form class="max-w-screen-2xl" @submit.prevent="updateSchoolAccountFunc()">
         <section class="grid grid-cols-2 gap-10">
           <main>
             <UFormField label="Select Document">
-              <USelectMenu
-v-model="selectedPdf" :items="schoolAccountData?.account_attachments" class="w-full"
+              <USelectMenu v-model="selectedPdf" :items="schoolAccountData?.account_attachments" class="w-full"
                 label-key="document_name" value-key="id" />
             </UFormField>
             <iframe :src="attachmentData" class="w-full h-[60svh] mt-5" />
@@ -32,58 +29,45 @@ v-model="selectedPdf" :items="schoolAccountData?.account_attachments" class="w-f
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
                     <UFormField :error="error?.admin_last_name && error?.admin_last_name[0]" label="Last Name" required>
-                      <UInput
-v-model="schoolCredentails.admin_last_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_last_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
-                    <UFormField
-:error="error?.admin_first_name && error?.admin_first_name[0]" label="First Name"
+                    <UFormField :error="error?.admin_first_name && error?.admin_first_name[0]" label="First Name"
                       required>
-                      <UInput
-v-model="schoolCredentails.admin_first_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_first_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
-                    <UFormField
-:error="error?.admin_middle_name && error?.admin_middle_name[0]" hint="Optional"
+                    <UFormField :error="error?.admin_middle_name && error?.admin_middle_name[0]" hint="Optional"
                       label="Middle Name">
-                      <UInput
-v-model="schoolCredentails.admin_middle_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_middle_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                     <UFormField :error="error?.admin_suffix && error?.admin_suffix[0]" hint="Optional" label="Suffix ">
-                      <UInput
-v-model="schoolCredentails.admin_suffix" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_suffix" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
-                    <UFormField
-:error="error?.admin_email_address && error?.admin_email_address[0]" required
+                    <UFormField :error="error?.admin_email_address && error?.admin_email_address[0]" required
                       label="Email Address">
-                      <UInput
-v-model="schoolCredentails.admin_email_address" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_email_address" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
-                    <UFormField
-:error="error?.admin_contact_number && error?.admin_contact_number[0]" hint="Optional"
+                    <UFormField :error="error?.admin_contact_number && error?.admin_contact_number[0]" hint="Optional"
                       label="Contact Number ">
-                      <UInput
-v-model="schoolCredentails.admin_contact_number" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.admin_contact_number" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
-                    <UFormField
-:error="error?.password && error?.password[0]" hint="optional" label="Password"
+                    <UFormField :error="error?.password && error?.password[0]" hint="optional" label="Password"
                       name="password">
-                      <UInput
-v-model="schoolCredentails.password" :type="show ? 'text' : 'password'" class="w-full"
+                      <UInput v-model="schoolCredentails.password" :type="show ? 'text' : 'password'" class="w-full"
                         placeholder="Password" size="lg" variant="outline">
                         <template #trailing>
-                          <UButton
-:aria-label="show ? 'Hide password' : 'Show password'" :aria-pressed="show"
+                          <UButton :aria-label="show ? 'Hide password' : 'Show password'" :aria-pressed="show"
                             :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'" aria-controls="password" color="neutral"
                             size="md" variant="link" @click="show = !show" />
                         </template>
@@ -110,57 +94,45 @@ v-model="schoolCredentails.password" :type="show ? 'text' : 'password'" class="w
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
                     <UFormField :error="error?.school_number && error?.school_number[0]" label="School Number" required>
-                      <UInput
-v-model="schoolCredentails.school_number" class="w-full" disabled size="md" type="number"
+                      <UInput v-model="schoolCredentails.school_number" class="w-full" disabled size="md" type="number"
                         variant="outline" />
                     </UFormField>
                     <UFormField :error="error?.school_name && error?.school_name[0]" label="School Name" required>
-                      <UInput
-v-model="schoolCredentails.school_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.school_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
-                    <UFormField
-:error="error?.school_address && error?.school_address[0]" label="School Address "
+                    <UFormField :error="error?.school_address && error?.school_address[0]" label="School Address "
                       required>
-                      <UInput
-                        v-model="schoolCredentails.school_address" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.school_address" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
-                    <UFormField
-                      :error="error?.school_head_name && error?.school_head_name[0]" label="School Head Name"
+                    <UFormField :error="error?.school_head_name && error?.school_head_name[0]" label="School Head Name"
                       hint="Optional">
-                      <UInput
-                        v-model="schoolCredentails.school_head_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.school_head_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
                     <UFormField :error="error?.owner_name && error?.owner_name[0]" hint="Optional" label="Owner Name">
-                      <UInput
-                        v-model="schoolCredentails.owner_name" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.owner_name" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
-                    <UFormField
-:error="error?.school_email_address && error?.school_email_address[0]"
+                    <UFormField :error="error?.school_email_address && error?.school_email_address[0]"
                       label="School Email Address" required>
-                      <UInput
-v-model="schoolCredentails.school_email_address" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.school_email_address" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
                   <div class="grid grid-cols-2 gap-5 ">
-                    <UFormField
-:error="error?.school_contact_number && error?.school_contact_number[0]"
+                    <UFormField :error="error?.school_contact_number && error?.school_contact_number[0]"
                       label="School Contact Number" required>
-                      <UInput
-v-model="schoolCredentails.school_contact_number" class="w-full" size="md" type="text"
+                      <UInput v-model="schoolCredentails.school_contact_number" class="w-full" size="md" type="text"
                         variant="outline" />
                     </UFormField>
                     <UFormField label="SDO Name" required>
-                      <UInput
-v-model="schoolCredentails.sdo_id" class="w-full" disabled size="md" type="text"
+                      <UInput v-model="schoolCredentails.sdo_id" class="w-full" disabled size="md" type="text"
                         variant="outline" />
                     </UFormField>
                   </div>
@@ -181,29 +153,26 @@ v-model="schoolCredentails.sdo_id" class="w-full" disabled size="md" type="text"
                     </div>
                   </div>
                   <form class="grid grid-cols-4 gap-10 items-end w-full " @submit.prevent="submitProgram">
-                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office" class="whitespace-nowrap text-xs" required>
+                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office"
+                      class="whitespace-nowrap text-xs" required>
 
-                      <USelect
-v-model="schoolPrograms.track" :default-value="''" :eager-validation="true"
+                      <USelect v-model="schoolPrograms.track" :default-value="''" :eager-validation="true"
                         :items="data?.programs" :multiple="false" class="w-full" label-key="track_key" required
                         size="xs" value-key="id" />
                     </UFormField>
-                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office" class="whitespace-nowrap text-xs" required>
+                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office"
+                      class="whitespace-nowrap text-xs" required>
 
-                      <USelect
-v-model="schoolPrograms.strand" :items="strandArr" :multiple="false" class="w-full"
+                      <USelect v-model="schoolPrograms.strand" :items="strandArr" :multiple="false" class="w-full"
                         label-key="name" required size="xs" value-key="name" />
                     </UFormField>
-                    <UFormField
-:error="error?.sdo_id && error?.sdo_id[0]" hint="Optional"
+                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" hint="Optional"
                       label="School Division Office" class="whitespace-nowrap text-xs">
 
-                      <USelect
-v-model="schoolPrograms.specialization" :items="specializationArr" :multiple="true"
+                      <USelect v-model="schoolPrograms.specialization" :items="specializationArr" :multiple="true"
                         class="w-full" size="xs" />
                     </UFormField>
-                    <UButton
-class="h-fit w-fit" color="success" icon="lucide:plus" label="EDIT" size="sm"
+                    <UButton class="h-fit w-fit" color="success" icon="lucide:plus" label="EDIT" size="sm"
                       type="submit">
                       add
                     </UButton>
@@ -233,8 +202,7 @@ class="h-fit w-fit" color="success" icon="lucide:plus" label="EDIT" size="sm"
                       </thead>
                       <tbody>
 
-                        <tr
-v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
+                        <tr v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
                           class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
                           <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
                             {{ track?.track }}
@@ -244,8 +212,7 @@ v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
                           </td>
                           <td class="px-6 py-4">
                             <li v-for="(spec, key) in track?.specialization" :key="spec">{{ spec }}
-                              <UIcon
-class="text-red-500 cursor-pointer" name="mdi:close"
+                              <UIcon class="text-red-500 cursor-pointer" name="mdi:close"
                                 @click="removeSpecialization(index, key)" />
 
                             </li>
@@ -323,7 +290,7 @@ const schoolCredentails = reactive<FirstTimeLoginType>({
 })
 const show = ref(false)
 const open = ref<boolean>(false)
-const schoolPrograms = reactive<{ track: string, track_key: string, strand: string, specialization?: string[] }>({
+const schoolPrograms = reactive<{ track: string, track_key: string, strand: string, specialization: string[] }>({
   track: '',
   track_key: '',
   strand: '',
@@ -402,7 +369,12 @@ const submitProgram = () => {
       specialization: schoolPrograms.specialization,
     })
   } else {
-    checkIfExist.specialization = schoolPrograms.specialization;
+   schoolPrograms.specialization.forEach((element:string) => {
+    if (!checkIfExist.specialization.includes(element)) {
+        checkIfExist.specialization.push(element);
+    }
+});
+   
   }
 
 }

@@ -6,6 +6,7 @@ export default defineNuxtRouteMiddleware(async () => {
     const token:string | null = localStorage.getItem('token');
     const role:string | null = localStorage.getItem('role');
 
+   
     const authStore = useAuthStore();
     if(token && (role && role === 'School'))
     {
@@ -22,6 +23,8 @@ export default defineNuxtRouteMiddleware(async () => {
         }
 
     }else{
+        
+
         return navigateTo('/');
     }
 })

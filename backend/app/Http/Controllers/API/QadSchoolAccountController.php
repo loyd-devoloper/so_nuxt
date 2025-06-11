@@ -89,7 +89,7 @@ class QadSchoolAccountController extends Controller
     function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'school_number' => 'required|unique:school_accounts,school_number|min:11|max:11',
+            'school_number' => 'required|unique:school_accounts,school_number',
             'school_email_address' => 'required|email|unique:school_accounts,school_email_address',
             'password' => ['required', Password::min(8)->mixedCase()->numbers()->symbols()],
             'school_name' => 'required|unique:school_accounts,school_name',
@@ -151,12 +151,12 @@ class QadSchoolAccountController extends Controller
                     $school_name = strtoupper(trim($row[9]));
                     if (empty($school_number)) {
                         throw new Exception("School number cannot be empty");
-                        continue;
+
                     }
 
                     if (!is_numeric($school_number)) {
                         throw new Exception("School number must be numeric");
-                        continue;
+
                     }
 
                     $school_number = (int)$school_number;
@@ -164,7 +164,7 @@ class QadSchoolAccountController extends Controller
                     // 2. Check for duplicates (uncomment if needed)
                     if (SchoolAccount::where('school_number', $school_number)->exists()) {
                         throw new Exception("Duplicate School ID '$school_number'");
-                        continue;
+
                     }
 
                     // Check for duplicate School name

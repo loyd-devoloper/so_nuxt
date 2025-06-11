@@ -21,7 +21,7 @@
 :items="sidebarItem" class="data-[orientation=vertical]" default-value="1"
           orientation="vertical" :ui="{
            
-            link: 'text-sm  font-normal text-muted data-active:font-medium before:rounded-none data-active:before:border-l-4 data-active:text-red-500  data-active:before:border-red-500 data-active:rounded-lg',
+            link: 'text-sm  font-normal text-muted data-active:font-medium before:rounded-none data-active:before:border-l-4 data-active:text-primary data-active:before:text-primary data-active:rounded-lg',
 
             childList: 'py-1'
           }" />
@@ -30,6 +30,8 @@
 
       <main class=" w-full max-w-[calc(100svw-16rem)]">
       <nav class="bg-white h-[4rem] border-b border-black/10 flex justify-end items-center px-4  ">
+        
+            <UButton color="neutral" icon="mdi:bell-outline" variant="ghost"/>
         <UDropdownMenu
             :items="profile"
             :ui="{
@@ -47,7 +49,7 @@
             <span class="mx-2 text-muted">/</span>
           </template>
         </UBreadcrumb>
-        <main class=" px-10 pt-16">
+        <main class=" px-10 pt-10">
           <slot/>
           <footer class="pt-10 text-center">
             Copyright © Designed & Developed by Deped 2025
@@ -159,7 +161,7 @@ const sidebarItem = computed(() => [
   },
    {
     label: 'Resources',
-    icon: 'material-symbols-light:dashboard-rounded',
+    icon: 'grommet-icons:resources',
     active: route.name == 'School-Resources',
     to: { name: 'School-Resources' }
 

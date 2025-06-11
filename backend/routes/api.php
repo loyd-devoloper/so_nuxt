@@ -7,6 +7,7 @@ use App\Http\Controllers\API\QadSchoolAccountController;
 use App\Http\Controllers\API\QadSdoAccountController;
 use App\Http\Controllers\API\QadTemplateController;
 use App\Http\Controllers\API\QadTransactionController;
+use App\Http\Controllers\API\School\ResourcesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,14 +17,15 @@ Route::get('/user', function (Request $request) {
 
 // Route::post('login',[AuthController::class,'login'])->middleware(['guest']);
 Route::middleware(['guest'])->prefix('auth')->group(function () {
-    Route::post('/qad/login', [AuthController::class, 'qadLogin']);
+    Route::post('/qad/login', [AuthController::class, 'qadLoginHome']);
+        // Route::post('/qad/login', [AuthController::class, 'qadLogin']);
     Route::post('/school/login', [\App\Http\Controllers\API\School\AuthController::class, 'schoolLogin']);
     Route::get('/otp-data/{verification_id}', [AuthController::class, 'getOtp']);
     Route::post('/otp-verification', [AuthController::class, 'verifyOtp']);
     Route::put('/otp-resend-verification', [AuthController::class, 'resendOtp']);
 });
 Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
-
+Route::get('/so/{so_id}',[QadTransactionController::class,'generate_so']);
 
 Route::middleware(['auth:sanctum', 'qad'])->prefix('qad')->group(function () {
     Route::get('/userInfo', [AuthController::class, 'qadInfo']);
@@ -90,11 +92,18 @@ Route::middleware(['auth:sanctum', 'qad'])->prefix('school')->group(function () 
     Route::controller(\App\Http\Controllers\API\School\TransactionController::class)->prefix('transaction')->group(function () {
         Route::post('/store', 'storeApplication');
         Route::get('/', 'index');
-        // student
+        ################################ STUDENT ##########################################################
         Route::get('/students/{application_id}', 'indexStudents');
         Route::post('/students/create/{application_id}', 'storeStudent');
         Route::post('/students/create/bulk/{application_id}', 'storeStudentBulk');
         Route::get('/students/edit/{student_id}', 'showStudent');
         Route::post('/students/update/{application_id}', 'updateStudent');
+    });
+    ################################ RESOURCES ##########################################################
+    Route::controller(ResourcesController::class)->prefix('resources')->group(function(){
+        Route::get('attachment','getAttachment');
+        Route::get('memo','getMemo');
+        Route::get('template','getTemplate');
+        Route::get('attachment-download/{attachment_id}','downloadAttachment');
     });
 });

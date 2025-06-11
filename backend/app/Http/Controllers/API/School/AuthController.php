@@ -119,7 +119,7 @@ class AuthController extends Controller
             "admin_middle_name" => 'nullable|string',
             "admin_last_name" => 'required|string',
             "admin_suffix" => 'nullable|string',
-            "admin_contact_number" => 'required',
+
             "admin_email_address" => 'required',
             "school_contact_number" => 'required',
             "school_email_address" => 'required',
@@ -183,8 +183,8 @@ class AuthController extends Controller
                 if ($request->hasFile("sec_permit")) {
                     $fileSaved = $this->storeFile($request->file('sec_permit'), $savingFolder);
                     $this->addDocument(
-                        $school->id,
-                        $documentName = "SEC Permit",
+                        $school->school_number,
+                        $request->file('sec_permit')->getClientOriginalName(),
                         $path = $fileSaved,
                         $expirationDate = $request->input('sec_expiration_date')
                     );
@@ -193,8 +193,8 @@ class AuthController extends Controller
                 if ($request->hasFile("shs_provisional_permit")) {
                     $fileSaved =  $this->storeFile($request->file('shs_provisional_permit'), $savingFolder);
                     $this->addDocument(
-                        $school->id,
-                        $documentName = "SHS Provisional Permit",
+                        $school->school_number,
+                        $request->file('shs_provisional_permit')->getClientOriginalName(),
                         $path = $fileSaved,
                         $expirationDate = $request->input('shs_provisional_expiration_date')
                     );
@@ -203,8 +203,8 @@ class AuthController extends Controller
                 if ($request->hasFile("mayors_permit")) {
                     $fileSaved =  $this->storeFile($request->file('mayors_permit'), $savingFolder);
                     $this->addDocument(
-                        $school->id,
-                        $documentName = "Mayors Permit",
+                        $school->school_number,
+                        $request->file('mayors_permit')->getClientOriginalName(),
                         $path = $fileSaved,
                         $expirationDate = $request->input('shs_provisional_expiration_date')
                     );
