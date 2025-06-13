@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\API;
 
-use NumberFormatter;
+
+use App\Models\School\SoStudent;
 use Illuminate\Http\Request;
+use NumberFormatter;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Carbon;
 use App\Http\Controllers\Controller;
@@ -13,10 +15,36 @@ use Illuminate\Support\Facades\Crypt;
 class QadTransactionController extends Controller
 {
 
+    public function show($so_application_id)
+    {
+        $application = SoApplication::query()->with(['documents','students'=>function ($query) {
+            $query->select('so_application_id','first_name','last_name','middle_name','status');
+        }])->where('id', $so_application_id)->first();
+
+        return response()->json($application);
+    }
+    public  function updateStudent()
+    {
+
+    }
+    public  function students($so_application_id): \Illuminate\Http\JsonResponse
+    {
+        $students = SoStudent::query()->where('so_application_id', $so_application_id)->get();
+
+        return response()->json($students,200);
+    }
+    public  function storeRemarks()
+    {
+
+    }
     public function generate_so($so_id)
     {
         //Get Application Info
-        $soApplication = SoApplication::query()->where(["id" => $so_id])->first();
+        $soApplication = SoApplication::query()->with(['students'=>function ($query) {
+                  $query
+                      ->where("status",'approved')
+                       ->whereNotNull("so_number");
+                }])->where(["id" => $so_id])->first();
         if (!empty($soApplication)) {
             if (!empty($soApplication->signed_so_path)) {
                 // return $this->loadFile(
@@ -37,6 +65,7 @@ class QadTransactionController extends Controller
                 //             ->whereNotNull("so_number");
                 //     }
                 // ]);
+                if(!$soApplication->students->first()?->so_number) return;
                 $page = 1; // You can change this dynamically
                 $generateSO = true;
                 $pdf = new Fpdi();
@@ -46,7 +75,6 @@ class QadTransactionController extends Controller
                 $pdf->setPrintFooter(false);
                 $pdf->SetAutoPageBreak(false);
                   $pdf->setSourceFile(public_path('template/so_template.pdf'));
-
                 while ($generateSO) { //Call the Creating PDF while the generateSO is true
                     $students = $soApplication->students->forPage($page, 30);
                     if ($students->count() > 0) {

@@ -6,23 +6,24 @@
         <UButton color="success" icon="lucide:edit" :label="label ?? 'Validate'" size="sm" type="button"
             variant="outline" />
         <template #body>
+              
             <form class="max-w-screen-2xl" @submit.prevent="updateSchoolAccountFunc()">
                 <section class="grid grid-cols-2 gap-10">
                     <main>
                         <UFormField label="Select Document">
-                            <USelectMenu v-model="selectedPdf" :items="schoolAccountData?.account_attachments"
+                            <USelectMenu v-model="selectedPdf" :items="cleanName"
                                 class="w-full" label-key="document_name" value-key="id" />
                         </UFormField>
                         <iframe :src="attachmentData" class="w-full h-[60svh] mt-5" />
                     </main>
                     <section>
 
-                        <div class="flex justify-between items-center gap-2"> 
+                        <div class="flex justify-between items-center gap-2">
                             <UButton>APPROVED</UButton>
 
-            <UInput icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
-                    variant="outline"/>
-    
+                            <UInput icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
+                                variant="outline" />
+
                         </div>
                         <div class="pt-4 max-h-[70svh] overflow-y-auto">
                             <table class="w-full  text-xs text-left rtl:text-right text-gray-500">
@@ -30,17 +31,13 @@
                                     <tr>
                                         <th class="px-6 py-3 " scope="col">
                                             <div class="flex items-center gap-2">
-                                                Track
+                                                Student Name
                                             </div>
                                         </th>
                                         <th class="px-6 py-3" scope="col">
-                                            <div class="flex items-center gap-2">
-                                                Strand
-                                            </div>
+                                            Remarks
                                         </th>
-                                        <th class="px-6 py-3" scope="col">
-                                            Specialization
-                                        </th>
+
 
                                         <th class="px-6 py-3" scope="col">
                                             Action
@@ -49,93 +46,43 @@
                                 </thead>
                                 <tbody>
 
-                                    <tr v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
+                                    <tr v-for="(student, index) in applicationData?.students" :key="student.id"
                                         class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
                                         <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                             scope="row">
-                                            {{ track?.track }}
-                                        </th>
-                                        <td class="px-6 py-4">
-                                            {{ track?.strand }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <li v-for="(spec, key) in track?.specialization" :key="spec">{{ spec }}
+                                            {{ student?.first_name + ' ' + student?.middle_name + ' ' +
+                                            student?.last_name }}
+                                   
+                                            <li v-for="(spec, key) in student?.specialization" :key="spec">{{ spec }}
                                                 <UIcon class="text-red-500 cursor-pointer" name="mdi:close"
                                                     @click="removeSpecialization(index, key)" />
 
                                             </li>
-                                        </td>
-
-
-                                        <td class="px-6 py-4">
-                                            <UButton icon="iconamoon:trash-light" variant="ghost"
-                                                @click="removeTrack(index)" />
-
-                                            <!--                       <UIcon class="text-red-500 cursor-pointer" name="iconamoon:trash-light"-->
-                                            <!--                                                 @click="removeSpecialization(index,key)"/>-->
-                                        </td>
-                                    </tr>
-                                    <tr v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
-                                        class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
-                                        <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                            scope="row">
-                                            {{ track?.track }}
                                         </th>
-                                        <td class="px-6 py-4">
-                                            {{ track?.strand }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <li v-for="(spec, key) in track?.specialization" :key="spec">{{ spec }}
-                                                <UIcon class="text-red-500 cursor-pointer" name="mdi:close"
-                                                    @click="removeSpecialization(index, key)" />
 
+                                        <td class="px-6 py-4">
+                                            <li>
+                                                dsadad
                                             </li>
+                                            <li>ddddddddddd</li>
                                         </td>
 
-
                                         <td class="px-6 py-4">
-                                            <UButton icon="iconamoon:trash-light" variant="ghost"
-                                                @click="removeTrack(index)" />
-
-                                            <!--                       <UIcon class="text-red-500 cursor-pointer" name="iconamoon:trash-light"-->
-                                            <!--                                                 @click="removeSpecialization(index,key)"/>-->
+                                            <UButton icon="material-symbols:check" variant="ghost" color="success" />
+                                            <UButton icon="material-symbols:close" variant="ghost" />
+                                            <UButton icon="mdi-light:comment" variant="ghost" color="info" />
                                         </td>
                                     </tr>
-                                    <tr v-for="(track, index) in schoolCredentails.program_offered" :key="track.id"
-                                        class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
-                                        <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                            scope="row">
-                                            {{ track?.track }}
-                                        </th>
-                                        <td class="px-6 py-4">
-                                            {{ track?.strand }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <li v-for="(spec, key) in track?.specialization" :key="spec">{{ spec }}
-                                                <UIcon class="text-red-500 cursor-pointer" name="mdi:close"
-                                                    @click="removeSpecialization(index, key)" />
 
-                                            </li>
-                                        </td>
-
-
-                                        <td class="px-6 py-4">
-                                            <UButton icon="iconamoon:trash-light" variant="ghost"
-                                                @click="removeTrack(index)" />
-
-                                            <!--                       <UIcon class="text-red-500 cursor-pointer" name="iconamoon:trash-light"-->
-                                            <!--                                                 @click="removeSpecialization(index,key)"/>-->
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </section>
                 </section>
-
+                   
             </form>
         </template>
-
+     
 
     </UModal>
 
@@ -145,10 +92,11 @@
 
 import { useMutation } from '@tanstack/vue-query'
 import { fetchLatestCurriculum } from "#shared/API/School/FirstTimeLoginApi";
-import type { StepperItem } from '@nuxt/ui'
-import type { FirstTimeLoginType } from "#shared/types/School/firstTimeLoginType";
-import { editSchoolAccount, updateSchoolAccount, viewAttachment } from "#shared/API/Qad/SchoolAccountApi";
 
+import type { FirstTimeLoginType } from "#shared/types/School/firstTimeLoginType";
+import { updateSchoolAccount, viewAttachment } from "#shared/API/Qad/SchoolAccountApi";
+
+const route = useRoute();
 
 const toast = useToast()
 const queryClient = useQueryClient();
@@ -157,7 +105,7 @@ const schoolCredentails = reactive<FirstTimeLoginType>({
 
 
 })
-const show = ref(false)
+
 const open = ref<boolean>(false)
 const schoolPrograms = reactive<{ track: string, track_key: string, strand: string, specialization: string[] }>({
     track: '',
@@ -193,28 +141,9 @@ watch(() => schoolPrograms.strand, (newStrand) => {
         specializationArr.value = newData?.values ?? [];
     }
 })
-// eslint-disable-next-line vue/prop-name-casing
-const props = defineProps<{ school_id?: string | number, label?: string }>()
-const { mutate, data: schoolAccountData } = useMutation({
-    mutationFn: () => editSchoolAccount(props.school_id || 0),
-    onSuccess: (data) => {
-        schoolCredentails.school_email_address = data.school_email_address;
-        schoolCredentails.admin_contact_number = data.admin_contact_number;
-        schoolCredentails.admin_email_address = data.admin_email_address;
-        schoolCredentails.admin_first_name = data.admin_first_name;
-        schoolCredentails.admin_last_name = data.admin_last_name;
-        schoolCredentails.admin_middle_name = data.admin_middle_name;
-        schoolCredentails.admin_suffix = data.admin_suffix;
-        schoolCredentails.owner_name = data.owner_name;
-        schoolCredentails.school_address = data.school_address;
-        schoolCredentails.school_contact_number = data.school_contact_number;
-        schoolCredentails.school_head_name = data.school_head_name;
-        schoolCredentails.school_name = data.school_name;
-        schoolCredentails.school_number = data.school_number;
-        schoolCredentails.sdo_id = data.sdo_information?.sdo_name;
-        schoolCredentails.program_offered = data.program_offered;
-    }
-})
+// eslint-disable-next-line vue/prop-name-casing, @typescript-eslint/no-explicit-any
+const props = defineProps<{ school_id?: string | number, label?: string, applicationData: {[key:string]: any} }>()
+
 const selectedPdf = ref<string>('');
 const { mutate: viewAttachmentFunc, data: attachmentData } = useMutation({
     mutationFn: () => viewAttachment(selectedPdf.value),
@@ -223,34 +152,8 @@ const { mutate: viewAttachmentFunc, data: attachmentData } = useMutation({
 watch(() => selectedPdf.value, () => {
     viewAttachmentFunc()
 })
-watch(() => open.value, (newOpen) => {
-    if (newOpen) mutate()
-})
-const submitProgram = () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const checkIfExist = schoolCredentails.program_offered.find((track: any) => {
-        return track.track === schoolPrograms.track_key && track.strand === schoolPrograms.strand;
-    });
-    if (checkIfExist === undefined) {
-        schoolCredentails.program_offered.push({
-            track: schoolPrograms.track_key,
-            strand: schoolPrograms.strand,
-            specialization: schoolPrograms.specialization,
-        })
-    } else {
-        schoolPrograms.specialization.forEach((element: string) => {
-            if (!checkIfExist.specialization.includes(element)) {
-                checkIfExist.specialization.push(element);
-            }
-        });
 
-    }
 
-}
-const removeTrack = (index: number) => {
-    schoolCredentails.program_offered.splice(index, 1);
-
-}
 const removeSpecialization = (trackIndex: number, specIndex: number) => {
     schoolCredentails.program_offered[trackIndex].specialization.splice(specIndex, 1);
 };
@@ -275,5 +178,15 @@ const { mutate: updateSchoolAccountFunc, error, isPending } = useMutation({
 
     },
 });
-
+const cleanName = computed(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const datax = props.applicationData?.documents?.filter((element:any) => {
+    
+        return element.document_name.endsWith('.pdf');
+    });
+    return datax;
+//   return value.replace(/\.xlsx$/i, '')
+//     .replace(/\.pdf$/i, '')
+//     .replace(/\.docx$/i, '')
+});
 </script>

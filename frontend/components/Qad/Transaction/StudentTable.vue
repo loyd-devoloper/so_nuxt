@@ -2,11 +2,12 @@
 
   <div class="relative overflow-x-auto shadow-md  sm:rounded-lg">
     <UCard class="shadow-none border border-muted drop-shadow-none">
-          <template #header class="pb-4" >
+          <template #header  >
         <div class="flex justify-between items-center gap-2">
 
 
-            <UInput v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
+            <UInput
+v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
                     variant="outline"/>
     
 
@@ -22,14 +23,16 @@
 
               <div class="flex items-center gap-2">
                 LRN
-                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('lrn')"/>
               </div>
             </th>
             <th class="px-6 py-3" scope="col">
               <div class="flex items-center gap-2">
                 First Name
-                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('first_name')"/>
               </div>
             </th>
@@ -39,7 +42,8 @@
                <th class="px-6 py-3" scope="col">
             <div class="flex items-center gap-2">
                 Last Name
-                <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                        @click="sortColumn('last_name')"/>
               </div>
             </th>
@@ -128,15 +132,15 @@
   </div>
 </template>
 <script setup lang="ts">
+import debounce from 'lodash.debounce'
+
+import {  fetchSoStudents } from '~/shared/API/School/TransactionApi';
+
 definePageMeta({
   middleware: ['school-middleware'],
   layout: 'school',
 });
-import debounce from 'lodash.debounce'
 
-import {  fetchSoStudents } from '~/shared/API/School/TransactionApi';
-import type { DropdownMenuItem } from '@nuxt/ui'
-import SchoolBulkStudent from '~/components/School/Transaction/SchoolBulkStudent.vue';
 
 const route = useRoute();
 const queryClient = useQueryClient();

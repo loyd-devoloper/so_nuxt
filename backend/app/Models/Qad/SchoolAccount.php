@@ -5,6 +5,7 @@ namespace App\Models\Qad;
 use App\Models\School\Documents;
 use App\Models\School\ProgramOffered;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -15,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 class SchoolAccount extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable,HasUuids;
     protected $fillable = [
         'school_number',
         'sdo_id',
@@ -104,6 +105,6 @@ class SchoolAccount extends Authenticatable
 
     public function accountAttachments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Documents::class, 'school_id', 'id');
+        return $this->hasMany(Documents::class, 'school_id', 'school_number');
     }
 }

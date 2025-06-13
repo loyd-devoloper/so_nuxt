@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('curricula', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->year('school_year_start');
             $table->year('school_year_end');
             $table->enum('is_open_for_so_application',["Open", "Close"])->default("Open");

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('program_lists', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('curriculum_id')->constrained('curricula')->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('curriculum_id');
             $table->string('track');
             $table->string('track_key');
             $table->json('strand');

@@ -1,3 +1,5 @@
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
+<!-- eslint-disable @typescript-eslint/no-explicit-any -->
 <template>
 
   <div>
@@ -48,7 +50,8 @@
 
         </form>
       </template>
-      <UButton color="secondary" icon="basil:add-outline" label="New Student" size="md" type="button"
+      <UButton
+color="secondary" icon="basil:add-outline" label="New Student" size="md" type="button"
                variant="solid"/>
     </UModal>
 
@@ -57,8 +60,7 @@
 </template>
 <script lang="ts" setup>
 import {useMutation} from '@tanstack/vue-query'
-import {useAuthStore} from "~/stores/AuthStore";
-import type {NewApplicationType, StudentType} from "#shared/types/School/SchoolApplicationType";
+import type { StudentType} from "#shared/types/School/SchoolApplicationType";
 import { StoreNewSoStudents} from "#shared/API/School/TransactionApi";
 
 const open = ref<boolean>(false)
@@ -85,7 +87,9 @@ const {mutate: storeApplicationFunc, error, isPending} = useMutation({
       icon: 'ooui:success'
     })
   },
-  onError: (error: any) => {
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onError: (_error: any) => {
 
   },
 });

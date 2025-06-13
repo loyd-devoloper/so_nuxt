@@ -4,12 +4,14 @@ namespace App\Models\School;
 
 use App\Models\Qad\Curriculum;
 use App\Models\Qad\SchoolAccount;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class SoApplication extends Model
 {
+    use HasUuids;
      protected $fillable = [
         'curriculum_id',
         'school_id',
@@ -45,5 +47,10 @@ class SoApplication extends Model
      public function schoolInfo(): HasOne
     {
         return $this->hasOne(SchoolAccount::class,'school_number','school_id');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Documents::class,'application_id','id');
     }
 }

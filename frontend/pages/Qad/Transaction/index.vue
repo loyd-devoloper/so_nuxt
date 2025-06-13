@@ -1,12 +1,14 @@
+
 <template>
     <div>
 
         <UCard class="shadow-md">
-            <template #header class="pb-4">
+            <template #header >
                 <div class="flex justify-between items-center gap-2">
 
 
-                    <UInput v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
+                    <UInput
+v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
                         variant="outline" />
                     <SchoolNewApplication />
 
@@ -23,7 +25,8 @@
 
                                 <div class="flex items-center gap-2">
                                     School Year
-                                    <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                                    <UIcon
+class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                                         @click="sortColumn('school_year_end')" />
                                 </div>
                             </th>
@@ -61,9 +64,10 @@
                     </thead>
                     <tbody>
                         <tr v-show="isLoading">
-                            <td class=" w-full" colspan="8">
+                            <td class=" w-full" colspan="10">
                                 <div class="flex justify-center py-10">
-                                    <UIcon class="animate-spin text-black/80"
+                                    <UIcon
+class="animate-spin text-black/80"
                                         name="ant-design:loading-3-quarters-outlined" size="3rem" />
                                 </div>
                             </td>
@@ -75,9 +79,11 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr v-for="application in data?.data" v-show="!isLoading" :key="application.id"
+                        <tr
+v-for="application in data?.data" v-show="!isLoading" :key="application.id"
                             class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
-                            <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                            <th
+class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                 scope="row">
                                 {{ application?.curriculum_info?.school_year_start + ' - ' +
                                     application?.curriculum_info?.school_year_end
@@ -106,7 +112,8 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
 
-                                    <UBadge variant="outline" class="capitalize"
+                                    <UBadge
+variant="outline" class="capitalize"
                                         :color="getStatusColor(application?.status)">{{
                                         application?.status }}</UBadge>
                                 </div>
@@ -118,7 +125,8 @@
 
 
                             <td class="px-6 py-4">
-                                <UDropdownMenu :items="items(application.id)" size="xs" :content="{
+                                <UDropdownMenu
+:items="items(application.id)" size="xs" :content="{
                                     align: 'start',
                                     side: 'bottom',
                                     sideOffset: 8
@@ -126,7 +134,8 @@
                     content: 'w-auto',
 
                 }">
-                                    <UButton label="Action" size="sm" icon="i-lucide-menu" color="neutral"
+                                    <UButton
+label="Action" size="sm" icon="i-lucide-menu" color="neutral"
                                         variant="outline" />
 
                                 </UDropdownMenu>
@@ -138,7 +147,8 @@
             </div>
 
 
-            <UPagination v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
+            <UPagination
+v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
                 class="pt-10  w-fit mx-auto " show-edges />
 
         </UCard>
@@ -148,15 +158,15 @@
     </div>
 </template>
 <script setup lang="ts">
+import debounce from 'lodash.debounce'
+import SchoolNewApplication from "~/components/School/Transaction/SchoolNewApplication.vue";
+import type { DropdownMenuItem } from '@nuxt/ui'
+import { fetchApplications } from '~/shared/API/Qad/TransactionApi';
 definePageMeta({
     middleware: ['qad-middleware'],
     layout: 'adminlayout',
 });
-import debounce from 'lodash.debounce'
-import SchoolNewApplication from "~/components/School/Transaction/SchoolNewApplication.vue";
-import { fetchSchoolApplication } from '~/shared/API/School/TransactionApi';
-import type { DropdownMenuItem } from '@nuxt/ui'
-import { fetchApplications } from '~/shared/API/Qad/TransactionApi';
+
 const items = (id: string): DropdownMenuItem[] => [
     {
         label: 'Profile',
@@ -176,6 +186,7 @@ const items = (id: string): DropdownMenuItem[] => [
     }
 ]
 const getStatusColor = (status: string) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const statusColors: any = {
         approved: 'success',
         pending: 'warning',

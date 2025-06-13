@@ -94,10 +94,10 @@ class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
               {{ schoolAccount?.admin_first_name }} {{ schoolAccount?.admin_last_name }}
             </td>
             <td class="px-6 py-4 capitalize">
-              {{ schoolAccount?.admin_contact_number }}
+              {{ schoolAccount?.school_email_address }}
             </td>
             <td class="px-6 py-4 capitalize">
-              {{ schoolAccount?.type }}
+              {{ schoolAccount?.school_contact_number }}
             </td>
             <td class="px-6 py-4">
               <div class="flex items-center">

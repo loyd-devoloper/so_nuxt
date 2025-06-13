@@ -17,8 +17,8 @@ Route::get('/user', function (Request $request) {
 
 // Route::post('login',[AuthController::class,'login'])->middleware(['guest']);
 Route::middleware(['guest'])->prefix('auth')->group(function () {
-    Route::post('/qad/login', [AuthController::class, 'qadLoginHome']);
-        // Route::post('/qad/login', [AuthController::class, 'qadLogin']);
+//    Route::post('/qad/login', [AuthController::class, 'qadLoginHome']);
+         Route::post('/qad/login', [AuthController::class, 'qadLogin'])->middleware('throttle:login');
     Route::post('/school/login', [\App\Http\Controllers\API\School\AuthController::class, 'schoolLogin']);
     Route::get('/otp-data/{verification_id}', [AuthController::class, 'getOtp']);
     Route::post('/otp-verification', [AuthController::class, 'verifyOtp']);
@@ -27,7 +27,7 @@ Route::middleware(['guest'])->prefix('auth')->group(function () {
 Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
 Route::get('/so/{so_id}',[QadTransactionController::class,'generate_so']);
 
-Route::middleware(['auth:sanctum', 'qad'])->prefix('qad')->group(function () {
+Route::middleware(['auth:sanctum', 'qad','throttle:api'])->prefix('qad')->group(function () {
     Route::get('/userInfo', [AuthController::class, 'qadInfo']);
     ################################## SDO ACCOUNT ########################################################
     Route::controller(QadSdoAccountController::class)->prefix('sdo-account')->group(function () {
@@ -62,7 +62,10 @@ Route::middleware(['auth:sanctum', 'qad'])->prefix('qad')->group(function () {
     ################################ Transaction ##########################################################
     Route::controller(QadTransactionController::class)->prefix('transaction')->group(function () {
         Route::get('/', 'index');
-
+        Route::get('/students/{so_application_id}','students');
+        Route::post('/update/student/{student_id}', 'updateStudent');
+        Route::post('/remarks/student/{student_id}', 'storeRemarks');
+        Route::get('/show/{so_application_id}', 'show');
     });
 
      ################################ Template ##########################################################

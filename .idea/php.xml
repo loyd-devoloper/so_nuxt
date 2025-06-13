@@ -138,6 +138,8 @@
       <path value="$PROJECT_DIR$/backend/vendor/spatie/db-dumper" />
       <path value="$PROJECT_DIR$/backend/vendor/spatie/laravel-backup" />
       <path value="$PROJECT_DIR$/backend/vendor/spatie/temporary-directory" />
+      <path value="$PROJECT_DIR$/backend/vendor/setasign/fpdi" />
+      <path value="$PROJECT_DIR$/backend/vendor/tecnickcom/tcpdf" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2">

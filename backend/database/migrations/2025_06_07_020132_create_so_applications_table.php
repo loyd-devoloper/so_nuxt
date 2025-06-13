@@ -12,19 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('so_applications', function (Blueprint $table) {
-            $table->id()->from('100002025');
-            $table->unsignedBigInteger('curriculum_id');
-            $table->unsignedBigInteger('school_id');
+            $table->uuid('id');
+            $table->uuid('curriculum_id');
+            $table->uuid('school_id');
 
             $table->string("applied_track");
             $table->string("applied_strand");
             $table->json("applied_specialization")->nullable();
             $table->enum('status', ['pending', 'onprocess', 'overdue', 'approved', 'releasing', 'for_claim', 'released'])->default('pending');
-            $table->unsignedBigInteger('form_checker')->nullable();
-            $table->unsignedBigInteger('evaluation_checker')->nullable();
-            $table->unsignedBigInteger('review_checker')->nullable();
-            $table->unsignedBigInteger('approve_checker')->nullable();
-            $table->unsignedBigInteger('signatory_id')->nullable();
+            $table->uuid('form_checker')->nullable();
+            $table->uuid('evaluation_checker')->nullable();
+            $table->uuid('review_checker')->nullable();
+            $table->uuid('approve_checker')->nullable();
+            $table->uuid('signatory_id')->nullable();
             $table->boolean('is_form_checked')->default(false);
             $table->boolean('is_evaluation_checked')->default(false);
             $table->boolean('is_review_checked')->default(false);

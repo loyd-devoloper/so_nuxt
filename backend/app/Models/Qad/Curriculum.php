@@ -2,10 +2,12 @@
 
 namespace App\Models\Qad;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Curriculum extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'school_year_start',
         'school_year_end',

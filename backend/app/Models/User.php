@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Notifications\Notifiable;
@@ -13,8 +14,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUuids;
+    public $incrementing = false;
 
+    // Set the key type
+    protected $keyType = 'string';
     /**
      * The attributes that are mass assignable.
      *
