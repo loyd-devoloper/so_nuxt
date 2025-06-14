@@ -6,6 +6,8 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -26,7 +28,9 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
         RateLimiter::for('login', function (Request $request) {
-            return Limit::perMinute(2)->by($request->ip());
+
+            return Limit::perMinute(6)->by($request->ip());
         });
+
     }
 }

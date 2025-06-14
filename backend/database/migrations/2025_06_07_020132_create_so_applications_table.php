@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('school_id');
 
             $table->string("applied_track");
-            $table->string("applied_strand");
+            $table->string("applied_strand")->nullable();
             $table->json("applied_specialization")->nullable();
             $table->enum('status', ['pending', 'onprocess', 'overdue', 'approved', 'releasing', 'for_claim', 'released'])->default('pending');
             $table->uuid('form_checker')->nullable();

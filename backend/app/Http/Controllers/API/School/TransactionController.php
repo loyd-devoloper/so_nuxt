@@ -30,7 +30,7 @@ class TransactionController extends Controller
             'form_9_file'           => 'required|mimes:pdf',
             'students_file'             => 'nullable|mimes:xls,xlsx,csv',
             "applied_track"             => 'required|string',
-            "applied_strand"            => 'required|string',
+            "applied_strand"            => 'nullable|string',
             "applied_specialization"    => 'nullable',
             "graduation_date"           => 'required',
             "curriculum_id"             => 'required',

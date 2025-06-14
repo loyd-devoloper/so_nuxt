@@ -3,29 +3,146 @@
 namespace App\Http\Controllers\API;
 
 
-use App\Models\School\SoStudent;
-use Illuminate\Http\Request;
+use App\Models\User;
 use NumberFormatter;
+use App\Models\Qad\SoNumber;
+use Illuminate\Http\Request;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Illuminate\Support\Carbon;
+use App\Models\School\SoStudent;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\School\SoApplication;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Validator;
 
 class QadTransactionController extends Controller
 {
 
+    public function approvedApplication($so_application_id)
+    {
+
+        $soApplication = SoApplication::with(['students'=>function($query){
+            $query->where('status','approved');
+        }])->where('id',$so_application_id)->first();
+        if (!$soApplication) {
+            return response()->json([
+                'message' => 'SO Application not found.'
+            ], 404);
+        }
+          if ( //check if form9, eval, and review is validated
+            $soApplication->is_form_checked &&
+            $soApplication->is_evaluation_checked &&
+            $soApplication->is_review_checked
+        ) {
+
+            if (!$soApplication->students && $soApplication->expiry_date < Carbon::now()) {
+                // $this->notifySchoolRejectedStudents($soApplication->id); // notify school
+            }
+            try {
+                $SoIssued = SoNumber::latest()->first(); // get the latest so issued number
+                $latestIssued = $SoIssued->latest_issued;
+
+                DB::beginTransaction();
+                    $soApplication->update([
+                        'status'                => 'approved',
+                        'date_granted'          => Carbon::now(),
+                        'is_approve_checked'    => 1,
+                    ]);
+
+                    foreach ($soApplication->students as $student) {
+                        $latestIssued++;
+                        SoStudent::where([ // issue so number to students that are approved
+                            'id' => $student->id,
+                        ])->update(['so_number' => $latestIssued]);
+                    }
+
+                    SoNumber::where('id', $SoIssued->id)
+                        ->update([
+                            'previous_issued'   => $SoIssued->latest_issued,
+                            'latest_issued'     => $latestIssued,
+                        ]);
+
+                    // $details = [
+                    //     'subject'           => 'Approval of Special Order',
+                    //     'type'              => 'approved',
+                    //     'school_name'       => $soApplication->school->school_name,
+                    //     'school_address'    => $soApplication->school->school_address,
+                    //     'school_head_name'  => $soApplication->school->school_head_name,
+                    //     'track'             => $soApplication->applied_track,
+                    //     'strand'            => $soApplication->applied_strand,
+                    //     'specialization'    => $soApplication->applied_specialization,
+                    //     'reference'         => $soApplication->id,
+                    // ];
+                    // // Mail::to($soApplication->school->school_email_address)
+                    // Mail::to('so.calabarzon@deped.gov.ph')->send(new SchoolApplicationNotification($details)); //for testing
+                    // $this->saveApplicationNotification($soApplication->school->id, 'approved', $details); // save notification
+                    // $this->saveApplicationLogs(auth('sanctum')->user()->id, $soApplication->id, 'Update', 'Approve SO Application', null); // save logs
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(["error" => $e], 401);
+            }
+            return response()->json(["message" => "SO Application updated successfully."], 200);
+        } else {
+            return response()->json([
+                'message' => 'SO Application is not fully validated.'
+            ], 400);
+        }
+    }
+    public function validatorStatus($so_application_id,Request $request)
+    {
+        $type = $request->type;
+          SoApplication::query()->where('id',$so_application_id)->update([
+            $type=>1
+          ]);
+          return response()->json(['success'=>"SO Application validated successfully."],200);
+    }
+    public function assignValidator(Request $request,$so_application_id)
+    {
+        $validator = Validator::make($request->all(),[
+            'form_checker'=>'required',
+             'evaluation_checker'=>'required',
+              'review_checker'=>'required',
+               'approve_checker'=>'required',
+        ]);
+        if($validator->fails())
+        {
+            return response()->json(['errors'=>$validator->errors()],422);
+        }
+        $so = SoApplication::query()->where('id',$so_application_id)->first();
+        $so->update($validator->validate());
+        $so->update([
+            'status'=>'onprocess'
+        ]);
+
+        return response()->json(['success'=>'Submitted Successfully'],200);
+    }
+    public function qadAccounts()
+    {
+        $qadAccounts = User::query()->select(['id','fname','lname'])->get();
+        return response()->json($qadAccounts,200);
+    }
     public function show($so_application_id)
     {
-        $application = SoApplication::query()->with(['documents','students'=>function ($query) {
-            $query->select('so_application_id','first_name','last_name','middle_name','status');
+        $application = SoApplication::query()
+        ->withCount(['students as students_approved'=>function($query){
+            $query->where('status','approved');
+        },'students as students_rejected'=>function($query){
+            $query->where('status','rejected');
+        },'students'])
+        ->with(['documents','schoolInfo','students'=>function ($query) {
+            $query->select(['id','so_application_id','first_name','last_name','middle_name','status']);
         }])->where('id', $so_application_id)->first();
 
         return response()->json($application);
     }
-    public  function updateStudent()
+    public  function updateStudent(Request $request)
     {
-
+        SoStudent::query()->where('id',$request->input('student_id'))->update([
+            'status'=>$request->input('type')
+        ]);
+         return response()->json(['success' => 'Student Updated Successfully'], 200);
     }
     public  function students($so_application_id): \Illuminate\Http\JsonResponse
     {

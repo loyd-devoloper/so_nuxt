@@ -90,10 +90,16 @@ class QadCurriculumController extends Controller
 
     public function storeProgram(Request $request,$curriculum_id): \Illuminate\Http\JsonResponse
     {
+        $strand = $request->strand[0];
+        $strandValue = $request->strand;
+        if (is_null($strand['name']) && empty($strand['values'])) {
+            $strandValue = [];
+        }
+
         $validator = Validator::make($request->all(), [
             "track"             => 'required',
             "track_key"               => 'required',
-            "strand"               => 'required',
+            // "strand"               => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
@@ -103,7 +109,7 @@ class QadCurriculumController extends Controller
             'curriculum_id'=>$curriculum_id,
             'track'=>$request->input('track'),
             'track_key'=>$request->input('track_key'),
-            'strand'=>$request->strand,
+            'strand'=>$strandValue,
         ]);
         return response()->json(['success'=>'Created Successfully'], 201);
     }

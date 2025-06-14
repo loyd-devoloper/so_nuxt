@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('user_id');
-            $table->string('type')->nullable();
-            $table->string('file')->nullable();
-            $table->text('content')->nullable();
-            $table->date('expiration_date')->nullable();
+        Schema::create('so_numbers', function (Blueprint $table) {
+             $table->id();
+            $table->integer('previous_issued');
+            $table->integer('latest_issued');
+            $table->integer('year');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::dropIfExists('so_numbers');
     }
 };

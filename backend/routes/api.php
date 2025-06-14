@@ -19,7 +19,7 @@ Route::get('/user', function (Request $request) {
 Route::middleware(['guest'])->prefix('auth')->group(function () {
 //    Route::post('/qad/login', [AuthController::class, 'qadLoginHome']);
          Route::post('/qad/login', [AuthController::class, 'qadLogin'])->middleware('throttle:login');
-    Route::post('/school/login', [\App\Http\Controllers\API\School\AuthController::class, 'schoolLogin']);
+    Route::post('/school/login', [\App\Http\Controllers\API\School\AuthController::class, 'schoolLogin'])->middleware('throttle:login');
     Route::get('/otp-data/{verification_id}', [AuthController::class, 'getOtp']);
     Route::post('/otp-verification', [AuthController::class, 'verifyOtp']);
     Route::put('/otp-resend-verification', [AuthController::class, 'resendOtp']);
@@ -63,9 +63,14 @@ Route::middleware(['auth:sanctum', 'qad','throttle:api'])->prefix('qad')->group(
     Route::controller(QadTransactionController::class)->prefix('transaction')->group(function () {
         Route::get('/', 'index');
         Route::get('/students/{so_application_id}','students');
-        Route::post('/update/student/{student_id}', 'updateStudent');
+        Route::post('/update/student', 'updateStudent');
         Route::post('/remarks/student/{student_id}', 'storeRemarks');
         Route::get('/show/{so_application_id}', 'show');
+        Route::post('update/validator-status/{so_application_id}','validatorStatus');
+        Route::post('approved-application/{so_application_id}','approvedApplication');
+        Route::get('/qad/accounts','qadAccounts');
+        Route::post('/assign-validator/{so_application_id}','assignValidator');
+        Route::get('generate-so/{so_application_id}','generate_so');
     });
 
      ################################ Template ##########################################################

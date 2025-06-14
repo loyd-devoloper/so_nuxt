@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('templates', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->uuid('user_id')->nullable();
             $table->string('name')->nullable();
             $table->string('type')->nullable()->default('Qad');
             $table->string('file_path')->nullable(); // Path to the file in the public directory
