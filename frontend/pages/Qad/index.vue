@@ -74,7 +74,9 @@ const {error,mutate:loginFunc,isPending} = useMutation({
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onError: (_error : any) => {
+  
       
   }
 })
+
 </script>

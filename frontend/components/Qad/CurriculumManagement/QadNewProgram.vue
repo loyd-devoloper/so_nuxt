@@ -23,9 +23,9 @@
         }">Strand</UButton>
 
         <div v-for="(strnd,index) in programData.strand" :key="index">
-          <UFormField :error="error?.strand && error?.strand[0]" label="Strand" required>
+          <UFormField :error="error?.strand && error?.strand[0]" label="Strand" >
             <UInput
-                v-model="programData.strand[index].name" required class="w-full" size="lg" type="text"
+                v-model="programData.strand[index].name"  class="w-full" size="lg" type="text"
                 variant="outline"/>
           </UFormField>
           <div class="flex justify-end">

@@ -1,14 +1,12 @@
-
 <template>
     <div>
 
         <UCard class="shadow-md">
-            <template #header >
+            <template #header>
                 <div class="flex justify-between items-center gap-2">
 
 
-                    <UInput
-v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
+                    <UInput v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
                         variant="outline" />
                     <SchoolNewApplication />
 
@@ -25,8 +23,7 @@ v-model="search" icon="i-lucide-search" placeholder="Filter..." size="md" type="
 
                                 <div class="flex items-center gap-2">
                                     School Year
-                                    <UIcon
-class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
+                                    <UIcon class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                                         @click="sortColumn('school_year_end')" />
                                 </div>
                             </th>
@@ -66,8 +63,7 @@ class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
                         <tr v-show="isLoading">
                             <td class=" w-full" colspan="10">
                                 <div class="flex justify-center py-10">
-                                    <UIcon
-class="animate-spin text-black/80"
+                                    <UIcon class="animate-spin text-black/80"
                                         name="ant-design:loading-3-quarters-outlined" size="3rem" />
                                 </div>
                             </td>
@@ -79,23 +75,21 @@ class="animate-spin text-black/80"
                                 </div>
                             </td>
                         </tr>
-                        <tr
-v-for="application in data?.data" v-show="!isLoading" :key="application.id"
+                        <tr v-for="application in data?.data" v-show="!isLoading" :key="application.id"
                             class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
-                            <th
-class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                            <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                                 scope="row">
                                 {{ application?.curriculum_info?.school_year_start + ' - ' +
                                     application?.curriculum_info?.school_year_end
                                 }}
                             </th>
-                               <td class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 {{ application?.school_info?.school_name }}
                             </td>
-                               <td class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 {{ application?.school_info?.school_address }}
                             </td>
-                               <td class="px-6 py-4">
+                            <td class="px-6 py-4">
                                 {{ application?.school_info?.sdo_information?.sdo_name }}
                             </td>
                             <td class="px-6 py-4">
@@ -112,10 +106,9 @@ class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
 
-                                    <UBadge
-variant="outline" class="capitalize"
+                                    <UBadge variant="outline" class="capitalize"
                                         :color="getStatusColor(application?.status)">{{
-                                        application?.status }}</UBadge>
+                                            application?.status }}</UBadge>
                                 </div>
 
                             </td>
@@ -125,19 +118,18 @@ variant="outline" class="capitalize"
 
 
                             <td class="px-6 py-4">
-                                <UDropdownMenu
-:items="items(application.id)" size="xs" :content="{
-                                    align: 'start',
-                                    side: 'bottom',
-                                    sideOffset: 8
-                                }" :ui="{
-                    content: 'w-auto',
 
-                }">
-                                    <UButton
-label="Action" size="sm" icon="i-lucide-menu" color="neutral"
-                                        variant="outline" />
+                                <UDropdownMenu size="xs" :items="items(application.id)">
+                                    <UButton label="Open" color="neutral" variant="outline" size="xs"
+                                        icon="i-lucide-menu" />
 
+                                    <template #item="{item}">
+                                        <template v-if="item.label === 'Assign Validator'">
+                                                <AssignSoValidator :application_id="application.id"/>
+                                        </template>
+                                        
+                                       
+                                    </template>
                                 </UDropdownMenu>
                             </td>
                         </tr>
@@ -147,8 +139,7 @@ label="Action" size="sm" icon="i-lucide-menu" color="neutral"
             </div>
 
 
-            <UPagination
-v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
+            <UPagination v-model:page="page" :items-per-page="data?.per_page" :sibling-count="1" :total="data?.total"
                 class="pt-10  w-fit mx-auto " show-edges />
 
         </UCard>
@@ -162,6 +153,7 @@ import debounce from 'lodash.debounce'
 import SchoolNewApplication from "~/components/School/Transaction/SchoolNewApplication.vue";
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { fetchApplications } from '~/shared/API/Qad/TransactionApi';
+import AssignSoValidator from '~/components/Qad/Transaction/AssignSoValidator.vue';
 definePageMeta({
     middleware: ['qad-middleware'],
     layout: 'adminlayout',
@@ -170,11 +162,19 @@ definePageMeta({
 const items = (id: string): DropdownMenuItem[] => [
     {
         label: 'Profile',
-        icon: 'i-lucide-user'
+        icon: 'i-lucide-user',
+        type:'label'
     },
     {
         label: 'So Preview',
         icon: 'qlementine-icons:preview-16'
+    },
+    {
+        label: 'Assign Validator',
+        type:'label',
+        icon: 'iwwa:assign',
+  
+
     },
     {
         label: 'Students',

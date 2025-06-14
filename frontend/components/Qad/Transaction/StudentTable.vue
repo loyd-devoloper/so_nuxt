@@ -55,10 +55,6 @@ class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
               Status
             </th>
  
-
-            <th class="px-6 py-3" scope="col">
-              Action
-            </th>
           </tr>
           </thead>
           <tbody>
@@ -113,10 +109,7 @@ class="cursor-pointer hover:text-black" name="lsicon:sort-filled" size="1rem"
             </td>
    
          
-         
-            <td class="px-6 py-4">
-                <SchoolTransactionSchoolEditStudent :student_id="student.id"/>
-            </td>
+
           </tr>
 
          </tbody>

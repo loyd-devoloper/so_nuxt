@@ -6,23 +6,53 @@
         <UButton color="success" icon="lucide:edit" :label="label ?? 'Validate'" size="sm" type="button"
             variant="outline" />
         <template #body>
-              
-            <form class="max-w-screen-2xl" @submit.prevent="updateSchoolAccountFunc()">
+
+            <form class="max-w-screen-2xl">
                 <section class="grid grid-cols-2 gap-10">
                     <main>
                         <UFormField label="Select Document">
-                            <USelectMenu v-model="selectedPdf" :items="cleanName"
-                                class="w-full" label-key="document_name" value-key="id" />
+                            <USelectMenu v-model="selectedPdf" :items="cleanName" class="w-full"
+                                label-key="document_name" value-key="id" />
                         </UFormField>
                         <iframe :src="attachmentData" class="w-full h-[60svh] mt-5" />
                     </main>
                     <section>
 
                         <div class="flex justify-between items-center gap-2">
-                            <UButton>APPROVED</UButton>
+                            <UButton
+                                v-if="!isAllStudentApproved && authStore.authUser.id === applicationData.form_checker && checkIfButtonShow('is_form_checked')"
+                                @click="changeValidatorStatusFunc('is_form_checked') ">
+                                Approved as Form 9 Checker</UButton>
+                            <UButton
+                                v-if="!isAllStudentApproved && authStore.authUser.id === applicationData.evaluation_checker && checkIfButtonShow('is_evaluation_checked')"
+                                @click="changeValidatorStatusFunc('is_evaluation_checked')">
+                               Approved as Evaluator</UButton>
+                                <UButton
+                                v-if="!isAllStudentApproved && authStore.authUser.id === applicationData.review_checker && checkIfButtonShow('is_review_checked')"
+                                @click="changeValidatorStatusFunc('is_review_checked')">
+                               Approved as Reviewer</UButton>
+                                <UButton
+                                v-if="!isAllStudentApproved && authStore.authUser.id === applicationData.approve_checker && checkIfButtonShow('is_approve_checked')"
+                                @click="approveApplicationFunc()">
+                               Approved & Generate So</UButton>
+                            <UInput icon="i-lucide-search" v-model="search" placeholder="Filter..." size="md"
+                                type="search" variant="outline" />
 
-                            <UInput icon="i-lucide-search" placeholder="Filter..." size="md" type="search"
-                                variant="outline" />
+                        </div>
+                        <div class="flex gap-2 text-xs pt-5">
+                            <p class="flex items-center">
+                                <UIcon name="icon-park-outline:dot" class="text-secondary" /> ALL ({{
+                                applicationData?.students_count }})
+                            </p>
+                            <p class="flex items-center">
+                                <UIcon name="icon-park-outline:dot" class="text-success" /> APPROVED ({{
+                                applicationData?.students_approved }})
+                            </p>
+                            <p class="flex items-center">
+                                <UIcon name="icon-park-outline:dot" class="text-error" /> REJECTED ({{
+                                applicationData?.students_rejected }})
+                            </p>
+
 
                         </div>
                         <div class="pt-4 max-h-[70svh] overflow-y-auto">
@@ -49,27 +79,32 @@
                                     <tr v-for="(student, index) in applicationData?.students" :key="student.id"
                                         class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
                                         <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                            scope="row">
+                                            :class="{
+                                                'bg-green-500': student.status === 'approved',
+                                                'bg-red-500 text-white': student.status === 'rejected',
+                                            }" scope="row">
                                             {{ student?.first_name + ' ' + student?.middle_name + ' ' +
-                                            student?.last_name }}
-                                   
+                                                student?.last_name }}
+
                                             <li v-for="(spec, key) in student?.specialization" :key="spec">{{ spec }}
-                                                <UIcon class="text-red-500 cursor-pointer" name="mdi:close"
-                                                    @click="removeSpecialization(index, key)" />
+                                                <UIcon class="text-red-500 cursor-pointer" name="mdi:close" />
 
                                             </li>
                                         </th>
 
                                         <td class="px-6 py-4">
+
                                             <li>
                                                 dsadad
                                             </li>
                                             <li>ddddddddddd</li>
                                         </td>
 
-                                        <td class="px-6 py-4">
-                                            <UButton icon="material-symbols:check" variant="ghost" color="success" />
-                                            <UButton icon="material-symbols:close" variant="ghost" />
+                                        <td class="px-6 py-4" v-if="applicationData.status === 'onprocess'">
+                                            <UButton @click="mutate({ student_id: student.id, type: 'approved' })"
+                                                icon="material-symbols:check" variant="ghost" color="success" />
+                                            <UButton @click="mutate({ student_id: student.id, type: 'rejected' })"
+                                                icon="material-symbols:close" variant="ghost" />
                                             <UButton icon="mdi-light:comment" variant="ghost" color="info" />
                                         </td>
                                     </tr>
@@ -79,70 +114,30 @@
                         </div>
                     </section>
                 </section>
-                   
+
             </form>
         </template>
-     
+
 
     </UModal>
 
 
 </template>
 <script lang="ts" setup>
-
 import { useMutation } from '@tanstack/vue-query'
-import { fetchLatestCurriculum } from "#shared/API/School/FirstTimeLoginApi";
-
-import type { FirstTimeLoginType } from "#shared/types/School/firstTimeLoginType";
-import { updateSchoolAccount, viewAttachment } from "#shared/API/Qad/SchoolAccountApi";
-
+import {  viewAttachment } from "#shared/API/Qad/SchoolAccountApi";
+import { debounce } from 'lodash';
+import { approveApplication, changeStudentStatus, updateValidatorStatus } from '~/shared/API/Qad/TransactionApi';
+const authStore = useAuthStore();
 const route = useRoute();
 
 const toast = useToast()
 const queryClient = useQueryClient();
-const schoolCredentails = reactive<FirstTimeLoginType>({
-    program_offered: [],
-
-
-})
 
 const open = ref<boolean>(false)
-const schoolPrograms = reactive<{ track: string, track_key: string, strand: string, specialization: string[] }>({
-    track: '',
-    track_key: '',
-    strand: '',
-    specialization: []
-})
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const strandArr = ref<{ [key: string]: any; }[]>([]);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const specializationArr = ref<{ [key: string]: any; }[]>([]);
-watch(() => schoolPrograms.track, (newTrack) => {
-    schoolPrograms.strand = '';
-    schoolPrograms.specialization = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const newData = data.value?.programs.find((value: any) => {
-        return value.id === newTrack
 
-    })
-    strandArr.value = newData?.strand;
-    schoolPrograms.track_key = newData?.track_key;
-})
-watch(() => schoolPrograms.strand, (newStrand) => {
-    specializationArr.value = [];
-    // schoolPrograms.strand = '';
-    if (newStrand) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const newData = strandArr.value.find((value: any) => {
-            return value.name === newStrand
-
-        })
-
-        specializationArr.value = newData?.values ?? [];
-    }
-})
 // eslint-disable-next-line vue/prop-name-casing, @typescript-eslint/no-explicit-any
-const props = defineProps<{ school_id?: string | number, label?: string, applicationData: {[key:string]: any} }>()
+const props = defineProps<{ school_id?: string | number, label?: string, applicationData: { [key: string]: any }, searchValue: string }>()
 
 const selectedPdf = ref<string>('');
 const { mutate: viewAttachmentFunc, data: attachmentData } = useMutation({
@@ -152,41 +147,68 @@ const { mutate: viewAttachmentFunc, data: attachmentData } = useMutation({
 watch(() => selectedPdf.value, () => {
     viewAttachmentFunc()
 })
+const { mutate } = useMutation({
+    mutationFn: (data: { student_id: string, type: string }) => changeStudentStatus(data),
+    onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: ['QAD_TRANSACTION_APPLICATION'] })
+        queryClient.invalidateQueries({ queryKey: ['QAD_TRANSACTION_STUDENTS'] })
 
-
-const removeSpecialization = (trackIndex: number, specIndex: number) => {
-    schoolCredentails.program_offered[trackIndex].specialization.splice(specIndex, 1);
-};
-
-const { data } = useQuery({
-    queryKey: ['FIRST_TIME_LOGIN'],
-    queryFn: () => fetchLatestCurriculum()
+    }
 })
-const { mutate: updateSchoolAccountFunc, error, isPending } = useMutation({
-    mutationFn: () => updateSchoolAccount(props.school_id || 0, schoolCredentails),
-    onSuccess: (data) => {
-        queryClient.invalidateQueries({ queryKey: ["QAD_SCHOOL_ACCOUNT"] });
-        open.value = false;
-        toast.add({
-            title: data,
-            color: 'success',
-            icon: 'ooui:success'
-        })
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (_err: any) => {
 
-    },
+const { mutate: changeValidatorStatusFunc } = useMutation({
+    mutationFn: (type: string) => updateValidatorStatus(route?.params?.application_id || '', type),
+   onSettled:(data) =>{
+       queryClient.invalidateQueries({ queryKey: ['QAD_TRANSACTION_APPLICATION'] })
+    toast.add({
+      title: data,
+      color: 'success',
+      icon:'ooui:success'
+    })
+   }
+   
+})
+const { mutate: approveApplicationFunc } = useMutation({
+    mutationFn: () => approveApplication(route?.params?.application_id || ''),
+   onSettled:(data) =>{
+       queryClient.invalidateQueries({ queryKey: ['QAD_TRANSACTION_APPLICATION'] })
+    toast.add({
+      title: data,
+      color: 'success',
+      icon:'ooui:success'
+    })
+   }
+   
+})
+const isAllStudentApproved = computed(() => {
+    console.log(props.applicationData.students.find((student: { [key: string]: any }) => student.status === 'pending' || student.status === 'rejected') )
+    return props.applicationData.students.find((student: { [key: string]: any }) => student.status === 'pending' || student.status === 'rejected') ? true : false;
 });
+
+
+const search = ref<string>('')
+// Debounced watcher
+watch(
+    search,
+    debounce((newValue: string) => {
+        queryClient.invalidateQueries({ queryKey: ['QAD_TRANSACTION_APPLICATION'] })
+    }, 300),
+    { immediate: true }
+);
+const checkIfButtonShow = (type:string) =>{
+      if(type === 'is_form_checked') return !props.applicationData?.is_form_checked && !props.applicationData?.is_evaluation_checked && !props.applicationData?.is_review_checked && !props.applicationData?.is_approve_checked;
+   if(type === 'is_evaluation_checked' ) return  props.applicationData?.is_form_checked && !props.applicationData?.is_evaluation_checked && !props.applicationData?.is_review_checked && !props.applicationData?.is_approve_checked;
+    if(type === 'is_review_checked' ) return  props.applicationData?.is_form_checked && props.applicationData?.is_evaluation_checked && !props.applicationData?.is_review_checked && !props.applicationData?.is_approve_checked;
+     if(type === 'is_approve_checked' ) return props.applicationData?.is_form_checked && props.applicationData?.is_evaluation_checked && props.applicationData?.is_review_checked && !props.applicationData?.is_approve_checked;
+}
+
 const cleanName = computed(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const datax = props.applicationData?.documents?.filter((element:any) => {
-    
+    const datax = props.applicationData?.documents?.filter((element: any) => {
+
         return element.document_name.endsWith('.pdf');
     });
     return datax;
-//   return value.replace(/\.xlsx$/i, '')
-//     .replace(/\.pdf$/i, '')
-//     .replace(/\.docx$/i, '')
+
 });
 </script>

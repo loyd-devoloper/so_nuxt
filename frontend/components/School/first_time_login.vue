@@ -186,18 +186,18 @@
                   </div>
                 </div>
                 <form class="grid grid-cols-5 gap-10 items-center w-full " @submit.prevent="submitProgram">
-                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office" required>
+                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="Track" required>
 
                     <USelect v-model="schoolPrograms.track" :default-value="''" :eager-validation="true"
                       :items="data?.programs" :multiple="false" class="w-full" label-key="track_key" required size="lg"
                       value-key="id" />
                   </UFormField>
-                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office" required>
+                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="Strand" >
 
                     <USelect v-model="schoolPrograms.strand" :items="strandArr" :multiple="false" class="w-full"
-                      label-key="name" required size="lg" value-key="name" />
+                      label-key="name"  size="lg" value-key="name" />
                   </UFormField>
-                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" hint="Optional" label="School Division Office">
+                  <UFormField :error="error?.sdo_id && error?.sdo_id[0]" hint="Optional" label="Specialization">
 
                     <USelect v-model="schoolPrograms.specialization" :items="specializationArr" :multiple="true"
                       class="w-full" size="lg" />

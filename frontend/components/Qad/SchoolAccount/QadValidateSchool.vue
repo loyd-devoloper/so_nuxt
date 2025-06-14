@@ -153,21 +153,21 @@
                     </div>
                   </div>
                   <form class="grid grid-cols-4 gap-10 items-end w-full " @submit.prevent="submitProgram">
-                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office"
+                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="Track"
                       class="whitespace-nowrap text-xs" required>
 
                       <USelect v-model="schoolPrograms.track" :default-value="''" :eager-validation="true"
                         :items="data?.programs" :multiple="false" class="w-full" label-key="track_key" required
                         size="xs" value-key="id" />
                     </UFormField>
-                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="School Division Office"
-                      class="whitespace-nowrap text-xs" required>
+                    <UFormField :error="error?.sdo_id && error?.sdo_id[0]" label="Strand"
+                      class="whitespace-nowrap text-xs" >
 
                       <USelect v-model="schoolPrograms.strand" :items="strandArr" :multiple="false" class="w-full"
-                        label-key="name" required size="xs" value-key="name" />
+                        label-key="name"  size="xs" value-key="name" />
                     </UFormField>
                     <UFormField :error="error?.sdo_id && error?.sdo_id[0]" hint="Optional"
-                      label="School Division Office" class="whitespace-nowrap text-xs">
+                      label="Specialization" class="whitespace-nowrap text-xs">
 
                       <USelect v-model="schoolPrograms.specialization" :items="specializationArr" :multiple="true"
                         class="w-full" size="xs" />
