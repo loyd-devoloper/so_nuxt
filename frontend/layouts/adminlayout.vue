@@ -97,6 +97,7 @@ const profile = ref<DropdownMenuItem[][]>([
     {
       label: 'Account Setting',
       icon: 'tdesign:user-setting',
+      to:{name: 'Qad-Setting'}
     },
     {
       label: 'Logout',

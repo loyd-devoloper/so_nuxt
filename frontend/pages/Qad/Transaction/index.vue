@@ -119,17 +119,11 @@
 
                             <td class="px-6 py-4">
 
-                                <UDropdownMenu size="xs" :items="items(application.id)">
+                                <UDropdownMenu size="xs" :items="items(application)">
                                     <UButton label="Open" color="neutral" variant="outline" size="xs"
                                         icon="i-lucide-menu" />
 
-                                    <template #item="{item}">
-                                        <template v-if="item.label === 'Assign Validator'">
-                                                <AssignSoValidator :application_id="application.id"/>
-                                        </template>
-                                        
-                                       
-                                    </template>
+                               
                                 </UDropdownMenu>
                             </td>
                         </tr>
@@ -143,7 +137,7 @@
                 class="pt-10  w-fit mx-auto " show-edges />
 
         </UCard>
-
+  <AssignSoValidator :application-data="applicationData"  :open="isAssignValidatorOpen" @close-modal="isAssignValidatorOpen = false"/>
 
 
     </div>
@@ -154,12 +148,18 @@ import SchoolNewApplication from "~/components/School/Transaction/SchoolNewAppli
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { fetchApplications } from '~/shared/API/Qad/TransactionApi';
 import AssignSoValidator from '~/components/Qad/Transaction/AssignSoValidator.vue';
+
 definePageMeta({
     middleware: ['qad-middleware'],
     layout: 'adminlayout',
 });
 
-const items = (id: string): DropdownMenuItem[] => [
+const applicationData = ref<{[key:string]: any}>({});
+const isAssignValidatorOpen = ref<boolean>(false);
+watch(()=>isAssignValidatorOpen.value,(newVal)=>{
+    if(!newVal) applicationData.value = {};
+})
+const items = (data:{[key:string]: any}): DropdownMenuItem[] => [
     {
         label: 'Profile',
         icon: 'i-lucide-user',
@@ -171,8 +171,14 @@ const items = (id: string): DropdownMenuItem[] => [
     },
     {
         label: 'Assign Validator',
-        type:'label',
+    
         icon: 'iwwa:assign',
+        onSelect:()=>{
+           
+            applicationData.value = data;
+            isAssignValidatorOpen.value = true;
+
+        }
   
 
     },
@@ -180,7 +186,7 @@ const items = (id: string): DropdownMenuItem[] => [
         label: 'Students',
         to: {
             name: 'Qad-Transaction-application_id',
-            params: { application_id: id } // Using the dynamic value here
+            params: { application_id: data.id } // Using the dynamic value here
         },
         icon: 'hugeicons:students'
     }

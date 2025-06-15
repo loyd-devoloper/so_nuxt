@@ -1,11 +1,11 @@
 <template>
 
 
-    <UModal v-model:open="open" :close="true" title="New School Account">
+    <UModal :open="open" :close="{onClick: () => closeModal()}" title="New School Account">
         <template #title>
             Assign Validator
         </template>
-        <div class="flex items-center gap-2"><UIcon name="iwwa:assign" size="1rem"/> <p> Assign Validator</p></div>
+       
         <!-- <UButton label="Assign Validator" type="button" variant="ghost" color="neutral" icon="iwwa:assign" size="sm" /> -->
         <template #body>
             <form class=" space-y-3" @submit.prevent="assignValidatorFunc()">
@@ -52,7 +52,7 @@
                 </UFormField>
                
                 <div class="space-x-2 mt-7 flex justify-end">
-                    <UButton color="neutral" label="Cancel" type="button" variant="outline" @click="open = false" />
+                    <UButton color="neutral" label="Cancel" type="button" variant="outline" @click="closeModal" />
                     <UButton :disabled="isPending" :loading="isPending" color="success" type="submit">
                         Assign
                     </UButton>
@@ -70,22 +70,34 @@
 import { useMutation } from '@tanstack/vue-query'
 import { assignValidator, getQadAccounts } from '~/shared/API/Qad/TransactionApi';
 import type { QadAccount } from '~/shared/types/Qad/TransactionType';
+const props = defineProps<{ open: boolean,applicationData:{[key:string]: any}}>()
 const toast = useToast()
 const show = ref<boolean>(false)
-const open = ref<boolean>(false)
+// const open = ref<boolean>(false)
 const queryClient = useQueryClient();
-const qadAccountData = reactive<QadAccount>({})
+const qadAccountData = reactive<QadAccount>({
+    approve_checker: props?.applicationData?.approve_checker,
+    form_checker:props?.applicationData?.form_checker,
+    evaluation_checker: props?.applicationData?.evaluation_checker,
+    review_checker:  props?.applicationData?.review_checker
+})
 
 const {data:qadAccounts} = useQuery({
     queryKey:['QAD_TRANSACTION_QAD_ACCOUNT'],
     queryFn:() => getQadAccounts()
 })
-const props = defineProps<{application_id:string}>()
+    const emit = defineEmits(['closeModal']);
+
+const closeModal = () => {
+    console.log('ss')
+  emit('closeModal');
+}
+
 const { mutate: assignValidatorFunc, error, isPending } = useMutation({
-    mutationFn: () => assignValidator(props.application_id || '',qadAccountData),
+    mutationFn: () => assignValidator(props.applicationData?.application_id || '',qadAccountData),
     onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: ["QAD_TRANSACTION"] });
-        open.value = false;
+        
         toast.add({
             title: data,
             color: 'success',

@@ -7,7 +7,7 @@
             <template #body>
                  <iframe :src="data" class="w-full h-[70svh]"></iframe>
             </template>
-             <UButton color="warning" icon="fontisto:preview" label="Generate So" size="sm"  type="button" variant="solid"/>
+            <slot/>
         </UModal>
 
     </div>
@@ -24,9 +24,9 @@ const toast = useToast()
 const route = useRoute();
 const queryClient = useQueryClient();
 const announcementData = reactive<AnnouncementType>({})
-const props = defineProps<{announcement_id?:string | number}>()
+const props = defineProps<{application_id?:any}>()
 const {mutate, data} = useMutation({
-  mutationFn:() => generateSo(route?.params?.application_id || ''),
+  mutationFn:() => generateSo(props.application_id),
 
 })
 watch(() => open.value,(newOpen) =>{

@@ -71,7 +71,8 @@
             <tr v-for="application in data?.data" v-show="!isLoading" :key="application.id"
               class="odd:bg-white  even:bg-gray-50  border-b  border-gray-200">
               <th class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" scope="row">
-                {{ application?.curriculum_info?.school_year_start + ' - ' + application?.curriculum_info?.school_year_end
+                {{ application?.curriculum_info?.school_year_start + ' - ' +
+                  application?.curriculum_info?.school_year_end
                 }}
               </th>
               <td class="px-6 py-4">
@@ -97,17 +98,26 @@
 
 
               <td class="px-6 py-4">
-                <UDropdownMenu :items="items(application.id)" size="xs" :content="{
-                  align: 'start',
-                  side: 'bottom',
-                  sideOffset: 8
-                }" :ui="{
-      content: 'w-auto',
+               
+                    <div v-if="application.status === 'approved' || application.status === 'releasing' || application.status === 'for_claim' || application.status === 'released'" class=" w-full">
+                      <QadTransactionQadPreviewSo :application_id="application.id">
+                        <UButton color="neutral" icon="qlementine-icons:preview-16" label="Generate So" size="sm"
+                          type="button" variant="ghost" />
+                      </QadTransactionQadPreviewSo>
+                    </div>
+                    <div  class=" w-full">
+                      <nuxt-link :to="{
+                        name: 'School-Transaction-Students-application_id',
+                        params: { application_id: application.id } // Using the dynamic value here
+                      }">
+                        <UButton label="Students" icon="hugeicons:students" color="neutral" size="sm" type="button"
+                          variant="ghost" />
+                      </nuxt-link>
+                    </div>
 
-    }">
-                  <UButton label="Action" size="sm" icon="i-lucide-menu" color="neutral" variant="outline" />
+               
+              
 
-                </UDropdownMenu>
               </td>
             </tr>
 
@@ -134,24 +144,25 @@ import debounce from 'lodash.debounce'
 import SchoolNewApplication from "~/components/School/Transaction/SchoolNewApplication.vue";
 import { fetchSchoolApplication } from '~/shared/API/School/TransactionApi';
 import type { DropdownMenuItem } from '@nuxt/ui'
-const items = (id: string): DropdownMenuItem[] => [
-  {
-    label: 'Profile',
-    icon: 'i-lucide-user'
-  },
-  {
-    label: 'So Preview',
-    icon: 'qlementine-icons:preview-16'
-  },
-  {
-    label: 'Students',
-    to: {
-      name: 'School-Transaction-Students-application_id',
-      params: { application_id: id } // Using the dynamic value here
-    },
-    icon: 'hugeicons:students'
-  }
-]
+// const items = (id: string): DropdownMenuItem[] => [
+//   {
+//     label: 'Profile',
+//     icon: 'i-lucide-user'
+//   },
+//   {
+//     label: 'So Preview',
+//     type: 'label',
+//     icon: 'qlementine-icons:preview-16'
+//   },
+//   {
+//     label: 'Students',
+//     to: {
+//       name: 'School-Transaction-Students-application_id',
+//       params: { application_id: id } // Using the dynamic value here
+//     },
+//     icon: 'hugeicons:students'
+//   }
+// ]
 const getStatusColor = (status: string) => {
   const statusColors: any = {
     approved: 'success',

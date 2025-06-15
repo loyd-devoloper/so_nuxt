@@ -49,7 +49,9 @@
                 <div class="space-x-1 grid grid-cols-3 items-center gap-2 mt-10">
                     <QadTransactionValidateStudent  :search-value="search" :application-data="data" school_id="1" />
                     <UButton color="neutral" icon="ix:log" variant="solid" label="Activity Log" size="sm" />
-                    <QadTransactionQadPreviewSo/>
+                    <QadTransactionQadPreviewSo :application_id="route?.params?.application_id || ''">
+                       <UButton color="warning" icon="fontisto:preview" label="Generate So" size="sm"  type="button" variant="solid"/>
+                      </QadTransactionQadPreviewSo>
                 </div>
             </UCard>
         </div>
