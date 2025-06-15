@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\User;
+use App\Traits\DocumentsTrait;
 use NumberFormatter;
 use App\Models\Qad\SoNumber;
 use Illuminate\Http\Request;
@@ -14,23 +15,39 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\School\SoApplication;
 use Illuminate\Support\Facades\Crypt;
+use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Validator;
 
 class QadTransactionController extends Controller
 {
-
+    use DocumentsTrait;
+ public function qr_scan(Request $request)
+    {
+        $id =  $request->q;
+        $soApplicationInfo = SoApplication::findorFail($id);
+        if (!empty($soApplicationInfo->signed_so_path)) {
+            return $this->loadFile(
+                SoApplication::class,
+                "signed_so_path",
+                $id,
+            );
+        } else {
+            //Show the Unsigned Generated Special Order
+            return $this->generate_so($id,$request);
+        }
+    }
     public function approvedApplication($so_application_id)
     {
 
-        $soApplication = SoApplication::with(['students'=>function($query){
-            $query->where('status','approved');
-        }])->where('id',$so_application_id)->first();
+        $soApplication = SoApplication::with(['students' => function ($query) {
+            $query->where('status', 'approved');
+        }])->where('id', $so_application_id)->first();
         if (!$soApplication) {
             return response()->json([
                 'message' => 'SO Application not found.'
             ], 404);
         }
-          if ( //check if form9, eval, and review is validated
+        if ( //check if form9, eval, and review is validated
             $soApplication->is_form_checked &&
             $soApplication->is_evaluation_checked &&
             $soApplication->is_review_checked
@@ -44,40 +61,40 @@ class QadTransactionController extends Controller
                 $latestIssued = $SoIssued->latest_issued;
 
                 DB::beginTransaction();
-                    $soApplication->update([
-                        'status'                => 'approved',
-                        'date_granted'          => Carbon::now(),
-                        'is_approve_checked'    => 1,
+                $soApplication->update([
+                    'status'                => 'approved',
+                    'date_granted'          => Carbon::now(),
+                    'is_approve_checked'    => 1,
+                ]);
+
+                foreach ($soApplication->students as $student) {
+                    $latestIssued++;
+                    SoStudent::where([ // issue so number to students that are approved
+                        'id' => $student->id,
+                    ])->update(['so_number' => $latestIssued]);
+                }
+
+                SoNumber::where('id', $SoIssued->id)
+                    ->update([
+                        'previous_issued'   => $SoIssued->latest_issued,
+                        'latest_issued'     => $latestIssued,
                     ]);
 
-                    foreach ($soApplication->students as $student) {
-                        $latestIssued++;
-                        SoStudent::where([ // issue so number to students that are approved
-                            'id' => $student->id,
-                        ])->update(['so_number' => $latestIssued]);
-                    }
-
-                    SoNumber::where('id', $SoIssued->id)
-                        ->update([
-                            'previous_issued'   => $SoIssued->latest_issued,
-                            'latest_issued'     => $latestIssued,
-                        ]);
-
-                    // $details = [
-                    //     'subject'           => 'Approval of Special Order',
-                    //     'type'              => 'approved',
-                    //     'school_name'       => $soApplication->school->school_name,
-                    //     'school_address'    => $soApplication->school->school_address,
-                    //     'school_head_name'  => $soApplication->school->school_head_name,
-                    //     'track'             => $soApplication->applied_track,
-                    //     'strand'            => $soApplication->applied_strand,
-                    //     'specialization'    => $soApplication->applied_specialization,
-                    //     'reference'         => $soApplication->id,
-                    // ];
-                    // // Mail::to($soApplication->school->school_email_address)
-                    // Mail::to('so.calabarzon@deped.gov.ph')->send(new SchoolApplicationNotification($details)); //for testing
-                    // $this->saveApplicationNotification($soApplication->school->id, 'approved', $details); // save notification
-                    // $this->saveApplicationLogs(auth('sanctum')->user()->id, $soApplication->id, 'Update', 'Approve SO Application', null); // save logs
+                // $details = [
+                //     'subject'           => 'Approval of Special Order',
+                //     'type'              => 'approved',
+                //     'school_name'       => $soApplication->school->school_name,
+                //     'school_address'    => $soApplication->school->school_address,
+                //     'school_head_name'  => $soApplication->school->school_head_name,
+                //     'track'             => $soApplication->applied_track,
+                //     'strand'            => $soApplication->applied_strand,
+                //     'specialization'    => $soApplication->applied_specialization,
+                //     'reference'         => $soApplication->id,
+                // ];
+                // // Mail::to($soApplication->school->school_email_address)
+                // Mail::to('so.calabarzon@deped.gov.ph')->send(new SchoolApplicationNotification($details)); //for testing
+                // $this->saveApplicationNotification($soApplication->school->id, 'approved', $details); // save notification
+                // $this->saveApplicationLogs(auth('sanctum')->user()->id, $soApplication->id, 'Update', 'Approve SO Application', null); // save logs
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
@@ -90,78 +107,77 @@ class QadTransactionController extends Controller
             ], 400);
         }
     }
-    public function validatorStatus($so_application_id,Request $request)
+    public function validatorStatus($so_application_id, Request $request)
     {
         $type = $request->type;
-          SoApplication::query()->where('id',$so_application_id)->update([
-            $type=>1
-          ]);
-          return response()->json(['success'=>"SO Application validated successfully."],200);
-    }
-    public function assignValidator(Request $request,$so_application_id)
-    {
-        $validator = Validator::make($request->all(),[
-            'form_checker'=>'required',
-             'evaluation_checker'=>'required',
-              'review_checker'=>'required',
-               'approve_checker'=>'required',
+        SoApplication::query()->where('id', $so_application_id)->update([
+            $type => 1
         ]);
-        if($validator->fails())
-        {
-            return response()->json(['errors'=>$validator->errors()],422);
+        return response()->json(['success' => "SO Application validated successfully."], 200);
+    }
+    public function assignValidator(Request $request, $so_application_id)
+    {
+        $validator = Validator::make($request->all(), [
+            'form_checker' => 'required',
+            'evaluation_checker' => 'required',
+            'review_checker' => 'required',
+            'approve_checker' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
-        $so = SoApplication::query()->where('id',$so_application_id)->first();
+        $so = SoApplication::query()->where('id', $so_application_id)->first();
         $so->update($validator->validate());
         $so->update([
-            'status'=>'onprocess'
+            'status' => 'onprocess'
         ]);
 
-        return response()->json(['success'=>'Submitted Successfully'],200);
+        return response()->json(['success' => 'Submitted Successfully'], 200);
     }
     public function qadAccounts()
     {
-        $qadAccounts = User::query()->select(['id','fname','lname'])->get();
-        return response()->json($qadAccounts,200);
+        $qadAccounts = User::query()->select(['id', 'fname', 'lname'])->get();
+        return response()->json($qadAccounts, 200);
     }
     public function show($so_application_id)
     {
         $application = SoApplication::query()
-        ->withCount(['students as students_approved'=>function($query){
-            $query->where('status','approved');
-        },'students as students_rejected'=>function($query){
-            $query->where('status','rejected');
-        },'students'])
-        ->with(['documents','schoolInfo','students'=>function ($query) {
-            $query->select(['id','so_application_id','first_name','last_name','middle_name','status']);
-        }])->where('id', $so_application_id)->first();
+            ->withCount(['students as students_approved' => function ($query) {
+                $query->where('status', 'approved');
+            }, 'students as students_rejected' => function ($query) {
+                $query->where('status', 'rejected');
+            }, 'students'])
+            ->with(['documents', 'schoolInfo', 'students' => function ($query) {
+                $query->select(['id', 'so_application_id', 'first_name', 'last_name', 'middle_name', 'status']);
+            }])->where('id', $so_application_id)->first();
 
         return response()->json($application);
     }
     public  function updateStudent(Request $request)
     {
-        SoStudent::query()->where('id',$request->input('student_id'))->update([
-            'status'=>$request->input('type')
+        SoStudent::query()->where('id', $request->input('student_id'))->update([
+            'status' => $request->input('type')
         ]);
-         return response()->json(['success' => 'Student Updated Successfully'], 200);
+        return response()->json(['success' => 'Student Updated Successfully'], 200);
     }
     public  function students($so_application_id): \Illuminate\Http\JsonResponse
     {
         $students = SoStudent::query()->where('so_application_id', $so_application_id)->get();
 
-        return response()->json($students,200);
+        return response()->json($students, 200);
     }
-    public  function storeRemarks()
+    public  function storeRemarks() {}
+    public function generate_so($so_id,Request $request)
     {
+         $tokenId = explode('|',$request->bearerToken())[0];
+        $role = PersonalAccessToken::query()->where('id', $tokenId)->first();
 
-    }
-    public function generate_so($so_id)
-    {
         //Get Application Info
-        $soApplication = SoApplication::query()->with(['students'=>function ($query) {
-                  $query
-                      ->where("status",'approved')
-                       ->whereNotNull("so_number");
-                }])->where(["id" => $so_id])->first();
+        $soApplication = SoApplication::query()->with(['students' => function ($query) {
+            $query
+                ->where("status", 'approved')
+                ->whereNotNull("so_number");
+        }])->where(["id" => $so_id])->first();
         if (!empty($soApplication)) {
             if (!empty($soApplication->signed_so_path)) {
                 // return $this->loadFile(
@@ -182,7 +198,7 @@ class QadTransactionController extends Controller
                 //             ->whereNotNull("so_number");
                 //     }
                 // ]);
-                if(!$soApplication->students->first()?->so_number) return;
+                if (!$soApplication->students->first()?->so_number) return;
                 $page = 1; // You can change this dynamically
                 $generateSO = true;
                 $pdf = new Fpdi();
@@ -191,12 +207,13 @@ class QadTransactionController extends Controller
                 $pdf->setPrintHeader(false);
                 $pdf->setPrintFooter(false);
                 $pdf->SetAutoPageBreak(false);
-                  $pdf->setSourceFile(public_path('template/so_template.pdf'));
+                $pdf->setSourceFile(public_path('template/so_template.pdf'));
+
                 while ($generateSO) { //Call the Creating PDF while the generateSO is true
                     $students = $soApplication->students->forPage($page, 30);
                     if ($students->count() > 0) {
                         //Call the function that will generate SO for every 30 student per page
-                        $this->prepare_so($pdf, $soApplication, $students, $page);
+                        $this->prepare_so($pdf, $soApplication, $students, $page,$role?->name);
                         $page++; //After This iteration, add 1 page to check if theres student in the next page
                     } else {
                         $generateSO = false;
@@ -211,8 +228,22 @@ class QadTransactionController extends Controller
             return response()->json(["message" => "S.O not found"]);
         }
     }
- private function prepare_so($pdf, $soApplication, $students, $page)
+     public function QRCodeStyle()
     {
+        return array(
+            'border' => 0,
+            'vpadding' => 0,
+            'hpadding' => 0,
+            'fgcolor' => array(255, 0, 0), // red foreground color
+            'bgcolor' => false, //array(255,255,255)
+            'module_width' => 1, // width of a single module in points
+            'module_height' => 1 // height of a single module in points
+        );
+    }
+
+    private function prepare_so($pdf, $soApplication, $students, $page, $role)
+    {
+
         $pdf->setSourceFile(public_path('template/so_template.pdf'));
         $tplId = $pdf->importPage(1);
         $size = $pdf->getTemplateSize($tplId);
@@ -221,10 +252,10 @@ class QadTransactionController extends Controller
 
         //Header
         //ADD QRCode
-        // $pdf->write2DBarcode(route("qr_code.so", ["q" => Crypt::encryptString($soApplication->id)]), 'QRCODE,M', 175, 15, 20, 20, $this->QRCodeStyle(), 'N');
+        $pdf->write2DBarcode(route("qr_code.so", ["q" => $soApplication->id]), 'QRCODE,M', 175, 15, 20, 20, $this->QRCodeStyle(), 'N');
         $pdf->setX(170);
         $pdf->SetFont('BOOKOS', '', 6);
-        $pdf->Cell(30, 3, "4A-QAD-SO" . $soApplication->id . "-P." . $page, 0, 1, 'C');
+        // $pdf->Cell(30, 3, "4A-QAD-SO" . $soApplication->id . "-P." . $page, 0, 1, 'C');
 
         //Headings
         // Date
@@ -257,19 +288,19 @@ class QadTransactionController extends Controller
 
         //SPECIALIZATION:
         $specialization = "";
-      if ($soApplication->applied_specialization) {
-    $specializations = json_decode($soApplication->applied_specialization, true);
-    if (is_array($specializations)) {
-        $specialization = ''; // Initialize the variable
-        $lastItem = end($specializations); // get last item
-        foreach ($specializations as $item) {
-            $specialization .= $item;
-            if ($item !== $lastItem) {
-                $specialization .= ", "; // Add comma only if not the last index of array
+        if ($soApplication->applied_specialization) {
+            $specializations = json_decode($soApplication->applied_specialization, true);
+            if (is_array($specializations)) {
+                $specialization = ''; // Initialize the variable
+                $lastItem = end($specializations); // get last item
+                foreach ($specializations as $item) {
+                    $specialization .= $item;
+                    if ($item !== $lastItem) {
+                        $specialization .= ", "; // Add comma only if not the last index of array
+                    }
+                }
             }
         }
-    }
-}
 
         //Third paragraph
         $thirdLine = "<b>Track :</b> <u><i>" . $soApplication->applied_track . " </i></u> <b>Strand </b>: <u><i>" . $soApplication->applied_strand . "</i></u> ";
@@ -321,7 +352,7 @@ class QadTransactionController extends Controller
             }
             $rows++;
         }
-        if($totalStudents > 15){ //the label bellow this condition will be fixed its location based on the number of students
+        if ($totalStudents > 15) { //the label bellow this condition will be fixed its location based on the number of students
             $pdf->setY(194);
         }
         $pdf->SetFont('BOOKOS', '', 10);
@@ -335,7 +366,7 @@ class QadTransactionController extends Controller
         $pdf->setX(12);
         $this->writeHTML($pdf, $string);
         if (
-            true
+            $role === 'Qad'
         ) { // Only for QAD and admin
             $pdf->setY(235);
             //Last Part (Signatories)
@@ -377,7 +408,7 @@ class QadTransactionController extends Controller
             $pdf->Image(public_path("template/watermark_so.png"), 0, 0, $size['width'], $size['height'], '', '', '', false, 300);
         }
     }
-private function writeHTML($pdf, $string)
+    private function writeHTML($pdf, $string)
     {
         $pdf->writeHTMLCell(
             185,     // width

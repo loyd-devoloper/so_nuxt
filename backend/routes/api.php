@@ -115,3 +115,4 @@ Route::middleware(['auth:sanctum', 'qad'])->prefix('school')->group(function () 
         Route::get('attachment-download/{attachment_id}','downloadAttachment');
     });
 });
+Route::get("/so/scan", [QadTransactionController::class, 'qr_scan'])->name("qr_code.so");
